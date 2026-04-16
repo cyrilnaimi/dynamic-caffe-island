@@ -1,0 +1,75 @@
+# =========================================================
+# Internal / not for FOSS distribution
+# =========================================================
+# Claude Code configuration, skills, memory, hooks
+.claude/
+
+# Spec-kit scaffolding and workflow tooling
+.specify/
+
+# Internal planning: specs, roadmaps, plans, tasks, checklists
+specs/
+
+# Agent / assistant instruction files
+CLAUDE.md
+AGENTS.md
+.cursorrules
+.cursor/
+
+# =========================================================
+# Secrets
+# =========================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.cert
+*.mobileprovision
+*.keystore
+secrets/
+
+# =========================================================
+# Swift / Xcode
+# =========================================================
+.build/
+.swiftpm/
+DerivedData/
+Build/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# =========================================================
+# macOS
+# =========================================================
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon?
+
+# =========================================================
+# Editors / IDEs
+# =========================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================================================
+# Logs / temp
+# =========================================================
+*.log
+tmp/
