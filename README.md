@@ -1,38 +1,78 @@
-# Dynamic Caffe Island
+<p align="center">
+  <img src="docs/manual/img/icon.png" width="128" alt="Dynamic Caffe Island icon">
+</p>
 
-A lightweight SwiftUI macOS app that renders a Dynamic-Island-style pill at the
-top of your display. It keeps your Mac awake on demand (via the system's
-power-assertion mechanism, à la `caffeinate`) and shows a live countdown until
-the next sleep or screensaver event.
+<h1 align="center">Dynamic Caffe Island</h1>
 
-Designed with a pluggable "profile" architecture so new event sources and
-animations can be added without modifying the core binary.
+<p align="center">
+  Keep your Mac awake — from a Dynamic Island.<br>
+  Even if your Mac has no notch. Free, open source (MIT), Intel + Apple silicon.
+</p>
 
-## Status
-
-Early, pre-alpha. No builds are published yet; the Xcode project and source
-will land once the animation vocabulary, UI concept, and plugin architecture
-are locked down.
+<p align="center">
+  <img src="docs/manual/img/en-expanded.png" width="533" alt="Expanded island during a keep-awake session">
+</p>
 
 ## Features
 
-- **Keep awake**: menu-driven caffeinate with presets (5 min, 15 min, 30 min,
-  1 h, 2 h, 5 h, "until a chosen time", and "indefinite") and one-click
-  cancel.
-- **Sleep countdown**: ambient display of the time remaining until display
-  sleep, screensaver, or system sleep — whichever comes first.
-- **Pluggable profiles**: third-party profiles discovered at launch so the
-  island can surface any event source with its own animation vocabulary.
+- **A notch on every Mac.** A black island hangs from the top of the screen: it
+  wraps the real notch on notched MacBooks and simulates one everywhere else.
+- **Keep awake in one hover.** 15 min, 30 min, 1 h, 2 h, ∞ or **until a
+  specific time** (a time already passed today means tomorrow). `+15m` / `+1h`
+  while running, one-click **Stop**.
+- **Live countdown** in the island and the menu bar — and, when idle, how long
+  until the screensaver / display sleep.
+- **Spotlight, Siri & Shortcuts** actions: *Keep Mac Awake*, *…for Minutes*,
+  *…Until*, *Let Mac Sleep*.
+- **Automation**: global hotkey <kbd>⌃⌥C</kbd>, `caffe://` URLs, and a tiny
+  `caffe` CLI.
+- **Tiny footprint**: under 1 % CPU, ~15 MB RAM, no network, no special
+  permissions. Uses the same power-assertion mechanism as `caffeinate`.
+- English and French ([add your language](docs/LOCALIZATION.md)).
 
-## Goals
+📖 **[User manual](docs/manual/index.html)** (English / Français)
 
-- Minimum CPU and RAM footprint while idle.
-- First-class accessibility: Reduce Motion, Increase Contrast, VoiceOver.
-- macOS only; no kernel extensions; no network features in v1.
+## Install
 
-## Build
+Download the latest `.dmg` from **Releases**, drag the app to Applications and
+launch it. Requires macOS 13 Ventura or later; one universal binary for Intel
+and Apple silicon.
 
-Not yet — the Xcode project is still being designed.
+Or build it yourself:
+
+```bash
+brew install xcodegen
+scripts/build-release.sh --install     # universal Release build → /Applications
+```
+
+## Use it from anywhere
+
+```bash
+caffe 45                                # 45 minutes   (scripts/caffe)
+open -g "caffe://until?time=19:45"      # until 19:45
+open -g "caffe://stop"
+```
+
+| URL | Action |
+|---|---|
+| `caffe://start?minutes=N` · `caffe://N` | Keep awake N minutes (1–1440) |
+| `caffe://until?time=HH:MM` · `caffe://until/HHMM` | Until a time of day |
+| `caffe://indefinite` | Until stopped |
+| `caffe://stop` · `caffe://toggle` | Stop · toggle 30 min |
+| `caffe://peek` · `caffe://pick` | Open the island · open the Until window |
+
+## Develop
+
+```bash
+xcodegen generate                       # DynamicCaffeIsland.xcodeproj (git-ignored)
+swift test --package-path Packages      # unit + contract tests
+scripts/e2e.sh                          # end-to-end test of the installed app
+python3 scripts/i18n-check.py           # localization lint
+```
+
+CI builds and tests natively on Intel and Apple silicon for every push. Pushing
+a `v*` tag builds one universal binary, smoke-tests it on both architectures
+and publishes a DMG + ZIP release. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

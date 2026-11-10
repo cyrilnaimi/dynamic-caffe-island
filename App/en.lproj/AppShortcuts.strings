@@ -1,0 +1,8 @@
+/* Siri / Spotlight phrases (App Shortcuts). Every phrase must keep ${applicationName};
+   keep ${duration} where present. macOS 13 needs .strings here (no String Catalog). */
+
+"Start ${applicationName}" = "Start ${applicationName}";
+"Caffeinate with ${applicationName}" = "Caffeinate with ${applicationName}";
+"Keep awake with ${applicationName} for ${duration}" = "Keep awake with ${applicationName} for ${duration}";
+"Stop ${applicationName}" = "Stop ${applicationName}";
+"Let my Mac sleep with ${applicationName}" = "Let my Mac sleep with ${applicationName}";

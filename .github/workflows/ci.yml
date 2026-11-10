@@ -1,0 +1,61 @@
+name: CI
+
+# Every push / PR: build + test natively on Intel and on Apple silicon.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15-intel   # x86_64 — last Intel-hosted image on GitHub
+            arch: intel
+          - os: macos-15         # arm64
+            arch: apple-silicon
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          sw_vers
+          uname -m
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Package tests (unit + contract + integration)
+        run: swift test --package-path Packages
+
+      - name: Build app (Debug, native arch)
+        run: |
+          xcodegen generate
+          set -o pipefail
+          xcodebuild build \
+            -project DynamicCaffeIsland.xcodeproj \
+            -scheme DynamicCaffeIsland \
+            -configuration Debug \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Localization lint
+        run: python3 scripts/i18n-check.py build/dd
+
+      - name: Smoke test (launch, keep awake, stop)
+        run: scripts/smoke-test.sh build/dd/Build/Products/Debug/DynamicCaffeIsland.app
