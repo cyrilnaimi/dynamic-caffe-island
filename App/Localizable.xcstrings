@@ -1,0 +1,735 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "+1 hour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+1 heure"
+          }
+        }
+      }
+    },
+    "+2 hours": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+2 heures"
+          }
+        }
+      }
+    },
+    "1 hour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 heure"
+          }
+        }
+      }
+    },
+    "15 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 minutes"
+          }
+        }
+      }
+    },
+    "15m": {
+      "comment": "Island chip: 15-minute preset. Keep very short (chip width).",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 min"
+          }
+        }
+      }
+    },
+    "1h": {
+      "comment": "Island chip: 1-hour preset. Keep very short.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 h"
+          }
+        }
+      }
+    },
+    "2 hours": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 heures"
+          }
+        }
+      }
+    },
+    "2h": {
+      "comment": "Island chip: 2-hour preset. Keep very short.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 h"
+          }
+        }
+      }
+    },
+    "30 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 minutes"
+          }
+        }
+      }
+    },
+    "30m": {
+      "comment": "Island chip: 30-minute preset. Keep very short.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 min"
+          }
+        }
+      }
+    },
+    "5 hours": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 heures"
+          }
+        }
+      }
+    },
+    "5 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 minutes"
+          }
+        }
+      }
+    },
+    "Add 1 hour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter 1 heure"
+          }
+        }
+      }
+    },
+    "Add 15 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter 15 minutes"
+          }
+        }
+      }
+    },
+    "Brewing… awake %@": {
+      "comment": "Toast when a session starts. %@ = “for 30 min” / “until 19:45” / “until you stop it”.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ça infuse… éveillé %@"
+          }
+        }
+      }
+    },
+    "Caffe Island": {
+      "comment": "Product name — do not translate.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caffe Island"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annuler"
+          }
+        }
+      }
+    },
+    "Coffee’s over. Your Mac can sleep": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Café terminé. Votre Mac peut dormir"
+          }
+        }
+      }
+    },
+    "Couldn’t keep the Mac awake": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de garder le Mac éveillé"
+          }
+        }
+      }
+    },
+    "Display sleeps in %@": {
+      "comment": "%@ = countdown like 4:12.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran en veille dans %@"
+          }
+        }
+      }
+    },
+    "Duration": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durée"
+          }
+        }
+      }
+    },
+    "Indefinite": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indéfiniment"
+          }
+        }
+      }
+    },
+    "Indefinitely": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indéfiniment"
+          }
+        }
+      }
+    },
+    "Keep Awake": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé"
+          }
+        }
+      }
+    },
+    "Keep Awake Until": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé jusqu’à"
+          }
+        }
+      }
+    },
+    "Keep Mac Awake": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé"
+          }
+        }
+      }
+    },
+    "Keep Mac Awake Until": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé jusqu’à"
+          }
+        }
+      }
+    },
+    "Keep Mac Awake for Minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé (minutes)"
+          }
+        }
+      }
+    },
+    "Keep Mac awake for ${duration}": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé pendant ${duration}"
+          }
+        }
+      }
+    },
+    "Keep Mac awake for ${minutes} minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé pendant ${minutes} minutes"
+          }
+        }
+      }
+    },
+    "Keep Mac awake until ${time}": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé jusqu’à ${time}"
+          }
+        }
+      }
+    },
+    "Keep awake for 1 hour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé 1 heure"
+          }
+        }
+      }
+    },
+    "Keep awake for 15 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé 15 minutes"
+          }
+        }
+      }
+    },
+    "Keep awake for 2 hours": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé 2 heures"
+          }
+        }
+      }
+    },
+    "Keep awake for 30 minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé 30 minutes"
+          }
+        }
+      }
+    },
+    "Keep awake until": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé jusqu’à"
+          }
+        }
+      }
+    },
+    "Keep awake until a specific time": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé jusqu’à une heure précise"
+          }
+        }
+      }
+    },
+    "Keep awake until time": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heure de fin"
+          }
+        }
+      }
+    },
+    "Keep awake until you stop it": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé jusqu’à l’arrêt"
+          }
+        }
+      }
+    },
+    "Keep the Mac awake until the chosen time (Return)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé jusqu’à l’heure choisie (Retour)"
+          }
+        }
+      }
+    },
+    "Keeping your Mac awake": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre Mac reste éveillé"
+          }
+        }
+      }
+    },
+    "Keeps the Mac awake until a time of day. A time already passed today means tomorrow.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garde le Mac éveillé jusqu’à une heure donnée. Une heure déjà passée aujourd’hui signifie demain."
+          }
+        }
+      }
+    },
+    "Let Mac Sleep": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laisser le Mac dormir"
+          }
+        }
+      }
+    },
+    "Mac sleeps in %@": {
+      "comment": "%@ = countdown like 4:12.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veille du Mac dans %@"
+          }
+        }
+      }
+    },
+    "Midnight": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuit"
+          }
+        }
+      }
+    },
+    "Minutes": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minutes"
+          }
+        }
+      }
+    },
+    "Pick a duration to stay awake": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez une durée d’éveil"
+          }
+        }
+      }
+    },
+    "Quick picks": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choix rapides"
+          }
+        }
+      }
+    },
+    "Quit Dynamic Caffe Island": {
+      "comment": "Contains the app name — keep it untranslated.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitter Dynamic Caffe Island"
+          }
+        }
+      }
+    },
+    "Screensaver in %@": {
+      "comment": "%@ = countdown like 4:12.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Économiseur d’écran dans %@"
+          }
+        }
+      }
+    },
+    "Sleep in %@": {
+      "comment": "%@ = countdown like 4:12.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veille dans %@"
+          }
+        }
+      }
+    },
+    "Something went wrong": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un problème est survenu"
+          }
+        }
+      }
+    },
+    "Starts a caffeine timer for a custom number of minutes.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lance un minuteur caféine pour le nombre de minutes choisi."
+          }
+        }
+      }
+    },
+    "Starts a caffeine timer in the island.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lance un minuteur caféine dans l’île."
+          }
+        }
+      }
+    },
+    "Stop": {
+      "comment": "Button that ends the session. Same word everywhere (menu, island, intents).",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter"
+          }
+        }
+      }
+    },
+    "Stop and let the Mac sleep (⌃⌥C)": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter et laisser le Mac dormir (⌃⌥C)"
+          }
+        }
+      }
+    },
+    "Stops the caffeine timer.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrête le minuteur caféine."
+          }
+        }
+      }
+    },
+    "Time": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heure"
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aujourd’hui"
+          }
+        }
+      }
+    },
+    "Tomorrow": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demain"
+          }
+        }
+      }
+    },
+    "Until a specific time…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jusqu’à une heure précise…"
+          }
+        }
+      }
+    },
+    "Until…": {
+      "comment": "Island chip that opens the Until window. Keep short.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jusqu’à…"
+          }
+        }
+      }
+    },
+    "Your Mac won't sleep before this time.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre Mac ne se mettra pas en veille avant cette heure."
+          }
+        }
+      }
+    },
+    "for %@": {
+      "comment": "Fragment inserted in the start toast. %@ = localised duration, e.g. “30 min”.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pendant %@"
+          }
+        }
+      }
+    },
+    "in %@": {
+      "comment": "Until window: time remaining. %@ = localised duration.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dans %@"
+          }
+        }
+      }
+    },
+    "indefinitely · tap Stop to end": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "indéfiniment · touchez Arrêter pour finir"
+          }
+        }
+      }
+    },
+    "until %@": {
+      "comment": "%@ = a localised clock time, e.g. “19:45” / “7:45 PM”.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "jusqu’à %@"
+          }
+        }
+      }
+    },
+    "until you stop it": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "jusqu’à l’arrêt"
+          }
+        }
+      }
+    },
+    "∞": {
+      "shouldTranslate": false
+    },
+    "☕ Awake until %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "☕ Éveillé jusqu’à %@"
+          }
+        }
+      }
+    },
+    "☕ Awake: %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "☕ Éveillé : %@"
+          }
+        }
+      }
+    },
+    "💤 Your Mac can sleep again": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💤 Votre Mac peut de nouveau dormir"
+          }
+        }
+      }
+    }
+  }
+}

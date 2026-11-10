@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dynamic Caffe Island Manual</title>
+<meta name="description" content="User manual for Dynamic Caffe Island — keep your Mac awake from a Dynamic Island.">
+<link rel="icon" href="img/icon.png">
+<style>
+  :root {
+    --bg: #faf7f2; --surface: #ffffff; --ink: #231a14; --muted: #6d625a;
+    --line: #e9e1d6; --accent: #b4672f; --accent-soft: #f6e6d6; --code-bg: #f3ede5;
+    --night: #1c1f4a; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141218; --surface: #1d1a22; --ink: #f1ebe4; --muted: #a79d94;
+      --line: #2f2a35; --accent: #eba56f; --accent-soft: #3a2a20; --code-bg: #26222c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141218; --surface: #1d1a22; --ink: #f1ebe4; --muted: #a79d94;
+    --line: #2f2a35; --accent: #eba56f; --accent-soft: #3a2a20; --code-bg: #26222c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  }
+  /* Language switching: only the active language is shown. */
+  html[lang="en"] [lang="fr"], html[lang="fr"] [lang="en"] { display: none !important; }
+
+  header.hero {
+    background: radial-gradient(1200px 400px at 50% -100px, #3b3478, var(--night));
+    color: #fff; padding: 56px 16px 64px; text-align: center;
+  }
+  .hero img.icon { width: 128px; height: 128px; filter: drop-shadow(0 12px 24px rgba(0,0,0,.35)); }
+  .hero h1 { font-size: clamp(30px, 6vw, 46px); margin: 12px 0 4px; letter-spacing: -0.02em; }
+  .hero p { margin: 0 auto; max-width: 560px; color: #d9d4f2; font-size: 18px; }
+  .hero .island { margin: 32px auto 0; max-width: 100%; }
+  .toolbar { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; justify-content: flex-end;
+    padding: 10px 16px; background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .toolbar button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .toolbar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  main { max-width: 880px; margin: 0 auto; padding: 24px 16px 80px; }
+  nav.toc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin: 8px 0 32px; }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+  @media (max-width: 600px) { nav.toc ol { columns: 1; } }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); }
+  section { margin: 48px 0; scroll-margin-top: 64px; }
+  h2 { font-size: 26px; letter-spacing: -0.01em; margin: 0 0 12px; }
+  h3 { font-size: 18px; margin: 24px 0 8px; }
+  p, li { color: var(--ink); }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  figure { margin: 20px 0; text-align: center; }
+  figure .shot { display: inline-block; padding: 24px; border-radius: var(--radius);
+    background: linear-gradient(160deg, #6fb7a8, #9cc58e 60%, #c9d98f); max-width: 100%; }
+  figure .shot.plain { background: var(--surface); border: 1px solid var(--line); }
+  figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+  .card h3 { margin-top: 0; }
+  code, kbd { white-space: nowrap; font: 14px ui-monospace, "SF Mono", Menlo, monospace; background: var(--code-bg); border-radius: 6px; padding: 1px 6px; }
+  kbd { border: 1px solid var(--line); border-bottom-width: 2px; }
+  pre { background: var(--code-bg); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; white-space: pre; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .tip { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 16px; margin: 16px 0; }
+  .tip strong { color: var(--accent); }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 16px; border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="toolbar" role="toolbar" aria-label="Language">
+  <button type="button" data-lang="en" aria-pressed="true">English</button>
+  <button type="button" data-lang="fr" aria-pressed="false">Français</button>
+</div>
+
+<header class="hero">
+  <img class="icon" src="img/icon.png" alt="Dynamic Caffe Island icon: a wide-awake coffee mug on a tiny island">
+  <h1>Dynamic Caffe Island</h1>
+  <p lang="en">Keep your Mac awake — right from a Dynamic Island. Even if your Mac has no notch.</p>
+  <p lang="fr">Gardez votre Mac éveillé, directement depuis une Dynamic Island. Même si votre Mac n’a pas d’encoche.</p>
+  <div class="island">
+    <img lang="en" src="img/en-live.png" width="278" alt="The island showing a live countdown">
+    <img lang="fr" src="img/fr-live.png" width="278" alt="L’île affichant un compte à rebours">
+  </div>
+</header>
+
+<main>
+  <nav class="toc" aria-label="Contents">
+    <ol lang="en">
+      <li><a href="#install">Install</a></li>
+      <li><a href="#island">Meet the island</a></li>
+      <li><a href="#start">Start a session</a></li>
+      <li><a href="#active">While your Mac is awake</a></li>
+      <li><a href="#until">Until a specific time</a></li>
+      <li><a href="#spotlight">Spotlight, Siri &amp; Shortcuts</a></li>
+      <li><a href="#keyboard">Keyboard, Terminal &amp; links</a></li>
+      <li><a href="#menu">Menu bar</a></li>
+      <li><a href="#languages">Languages</a></li>
+      <li><a href="#privacy">Privacy &amp; permissions</a></li>
+      <li><a href="#faq">Troubleshooting</a></li>
+    </ol>
+    <ol lang="fr">
+      <li><a href="#install">Installation</a></li>
+      <li><a href="#island">Découvrir l’île</a></li>
+      <li><a href="#start">Lancer une session</a></li>
+      <li><a href="#active">Pendant que le Mac reste éveillé</a></li>
+      <li><a href="#until">Jusqu’à une heure précise</a></li>
+      <li><a href="#spotlight">Spotlight, Siri et Raccourcis</a></li>
+      <li><a href="#keyboard">Clavier, Terminal et liens</a></li>
+      <li><a href="#menu">Barre des menus</a></li>
+      <li><a href="#languages">Langues</a></li>
+      <li><a href="#privacy">Confidentialité et autorisations</a></li>
+      <li><a href="#faq">Dépannage</a></li>
+    </ol>
+  </nav>
+
+  <section id="install">
+    <h2 lang="en">Install</h2><h2 lang="fr">Installation</h2>
+    <div lang="en">
+      <ol>
+        <li>Download the latest <code>DynamicCaffeIsland-x.y.z.dmg</code> from the project’s <strong>GitHub Releases</strong> page.</li>
+        <li>Open it and drag <strong>DynamicCaffeIsland</strong> into <strong>Applications</strong>.</li>
+        <li>Launch it from Applications. The first time, if macOS says the developer can’t be verified, right-click the app → <strong>Open</strong> → <strong>Open</strong>.</li>
+      </ol>
+      <p class="muted">Requires macOS 13 Ventura or later. One universal download runs natively on both Intel and Apple silicon Macs.</p>
+    </div>
+    <div lang="fr">
+      <ol>
+        <li>Téléchargez le dernier <code>DynamicCaffeIsland-x.y.z.dmg</code> depuis la page <strong>Releases</strong> du projet sur GitHub.</li>
+        <li>Ouvrez-le et glissez <strong>DynamicCaffeIsland</strong> dans <strong>Applications</strong>.</li>
+        <li>Lancez l’app depuis Applications. La première fois, si macOS indique que le développeur ne peut pas être vérifié : clic droit sur l’app → <strong>Ouvrir</strong> → <strong>Ouvrir</strong>.</li>
+      </ol>
+      <p class="muted">Nécessite macOS 13 Ventura ou ultérieur. Un seul téléchargement universel, natif sur Mac Intel et Apple silicon.</p>
+    </div>
+  </section>
+
+  <section id="island">
+    <h2 lang="en">Meet the island</h2><h2 lang="fr">Découvrir l’île</h2>
+    <p lang="en">A small black island hangs from the top centre of your main screen. On a MacBook with a notch it wraps around the real notch; on any other Mac it <strong>simulates one</strong>. When nothing is running it quietly shows how long until the screensaver, display sleep or system sleep kicks in.</p>
+    <p lang="fr">Une petite île noire est suspendue en haut au centre de votre écran principal. Sur un MacBook à encoche, elle entoure la vraie encoche ; sur les autres Mac, elle <strong>en simule une</strong>. Au repos, elle indique discrètement dans combien de temps l’économiseur d’écran, la veille de l’écran ou du Mac se déclenche.</p>
+    <figure>
+      <div class="shot"><img lang="en" src="img/en-idle.png" width="198" alt="Idle island with sleep countdown"><img lang="fr" src="img/fr-idle.png" width="198" alt="Île au repos avec compte à rebours de veille"></div>
+      <figcaption lang="en">Idle: dim cup on the left, time until sleep on the right.</figcaption>
+      <figcaption lang="fr">Au repos : tasse grisée à gauche, temps avant la veille à droite.</figcaption>
+    </figure>
+    <p lang="en">Elsewhere on screen the island is click-through — it never blocks the menu bar or your windows.</p>
+    <p lang="fr">Ailleurs à l’écran, l’île laisse passer les clics : elle ne bloque jamais la barre des menus ni vos fenêtres.</p>
+  </section>
+
+  <section id="start">
+    <h2 lang="en">Start a session</h2><h2 lang="fr">Lancer une session</h2>
+    <p lang="en"><strong>Move the pointer onto the island</strong> to open it, then pick a duration: <code>15m</code>, <code>30m</code>, <code>1h</code>, <code>2h</code>, <code>∞</code> (until you stop it) or <code>Until…</code>.</p>
+    <p lang="fr"><strong>Placez le pointeur sur l’île</strong> pour l’ouvrir, puis choisissez une durée : <code>15 min</code>, <code>30 min</code>, <code>1 h</code>, <code>2 h</code>, <code>∞</code> (jusqu’à l’arrêt) ou <code>Jusqu’à…</code>.</p>
+    <figure>
+      <div class="shot"><img lang="en" src="img/en-expanded-idle.png" width="533" alt="Expanded island with duration chips"><img lang="fr" src="img/fr-expanded-idle.png" width="533" alt="Île déployée avec les durées"></div>
+    </figure>
+    <p lang="en">A short toast confirms the start, then the island settles into a compact live timer with a progress ring.</p>
+    <p lang="fr">Une courte notification confirme le démarrage, puis l’île devient un minuteur compact avec un anneau de progression.</p>
+    <div class="grid">
+      <figure>
+        <div class="shot"><img lang="en" src="img/en-toast.png" width="368" alt="Brewing toast"><img lang="fr" src="img/fr-toast.png" width="368" alt="Notification « Ça infuse »"></div>
+        <figcaption lang="en">Start confirmation</figcaption><figcaption lang="fr">Confirmation du démarrage</figcaption>
+      </figure>
+      <figure>
+        <div class="shot"><img lang="en" src="img/en-live.png" width="278" alt="Live timer"><img lang="fr" src="img/fr-live.png" width="278" alt="Minuteur en cours"></div>
+        <figcaption lang="en">Live timer</figcaption><figcaption lang="fr">Minuteur en cours</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="active">
+    <h2 lang="en">While your Mac is awake</h2><h2 lang="fr">Pendant que le Mac reste éveillé</h2>
+    <p lang="en">Hover the island again to see the end time and big countdown. <code>+ 15m</code> and <code>+ 1h</code> extend the session, <code>Until…</code> sets a new end time, and <strong>Stop</strong> ends it immediately.</p>
+    <p lang="fr">Survolez de nouveau l’île pour voir l’heure de fin et le grand compte à rebours. <code>+ 15 min</code> et <code>+ 1 h</code> prolongent la session, <code>Jusqu’à…</code> fixe une nouvelle heure de fin, et <strong>Arrêter</strong> la termine immédiatement.</p>
+    <figure>
+      <div class="shot"><img lang="en" src="img/en-expanded.png" width="533" alt="Expanded island during a session"><img lang="fr" src="img/fr-expanded.png" width="533" alt="Île déployée pendant une session"></div>
+    </figure>
+    <p lang="en">When the time is up (or you press Stop) the island says goodbye and your Mac goes back to its normal sleep settings.</p>
+    <p lang="fr">À la fin (ou quand vous appuyez sur Arrêter), l’île vous le signale et le Mac retrouve ses réglages de veille habituels.</p>
+    <figure>
+      <div class="shot"><img lang="en" src="img/en-stopped.png" width="368" alt="Session over toast"><img lang="fr" src="img/fr-stopped.png" width="368" alt="Notification de fin"></div>
+    </figure>
+  </section>
+
+  <section id="until">
+    <h2 lang="en">Until a specific time</h2><h2 lang="fr">Jusqu’à une heure précise</h2>
+    <p lang="en">Choose <code>Until…</code> in the island (or <strong>Until a specific time…</strong> in the menu bar). Set the time with the field or a quick pick, then press <kbd>Return</kbd> or <strong>Keep Awake</strong>. <kbd>Esc</kbd> cancels.</p>
+    <p lang="fr">Choisissez <code>Jusqu’à…</code> dans l’île (ou <strong>Jusqu’à une heure précise…</strong> dans la barre des menus). Réglez l’heure avec le champ ou un choix rapide, puis appuyez sur <kbd>Retour</kbd> ou <strong>Garder éveillé</strong>. <kbd>Échap</kbd> annule.</p>
+    <figure>
+      <div class="shot plain"><img lang="en" src="img/en-until-window.png" width="380" alt="Keep Awake Until window"><img lang="fr" src="img/fr-until-window.png" width="380" alt="Fenêtre Garder éveillé jusqu’à"></div>
+    </figure>
+    <div class="tip" lang="en"><strong>Tomorrow is automatic.</strong> A time that has already passed today means tomorrow — choose 08:00 at 23:00 and your Mac stays awake through the night. The window always tells you “Today” or “Tomorrow” and how long that is.</div>
+    <div class="tip" lang="fr"><strong>Le lendemain est automatique.</strong> Une heure déjà passée aujourd’hui désigne le lendemain : choisissez 08:00 à 23:00 et le Mac reste éveillé toute la nuit. La fenêtre indique toujours « Aujourd’hui » ou « Demain » et la durée correspondante.</div>
+  </section>
+
+  <section id="spotlight">
+    <h2 lang="en">Spotlight, Siri &amp; Shortcuts</h2><h2 lang="fr">Spotlight, Siri et Raccourcis</h2>
+    <p lang="en">Press <kbd>⌘</kbd> <kbd>Space</kbd> and type an action name. The same actions are available in the Shortcuts app for your own automations.</p>
+    <p lang="fr">Appuyez sur <kbd>⌘</kbd> <kbd>Espace</kbd> et tapez le nom d’une action. Les mêmes actions sont disponibles dans l’app Raccourcis pour vos automatisations.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th lang="en">Action</th><th lang="fr">Action</th><th lang="en">What it does</th><th lang="fr">Effet</th></tr></thead>
+      <tbody>
+        <tr><td><span lang="en">Keep Mac Awake</span><span lang="fr">Garder le Mac éveillé</span></td><td><span lang="en">15 min, 30 min, 1 h, 2 h or indefinitely</span><span lang="fr">15 min, 30 min, 1 h, 2 h ou indéfiniment</span></td></tr>
+        <tr><td><span lang="en">Keep Mac Awake for Minutes</span><span lang="fr">Garder le Mac éveillé (minutes)</span></td><td><span lang="en">Any number of minutes (1–1440)</span><span lang="fr">N’importe quel nombre de minutes (1 à 1440)</span></td></tr>
+        <tr><td><span lang="en">Keep Mac Awake Until</span><span lang="fr">Garder le Mac éveillé jusqu’à</span></td><td><span lang="en">Until a time of day</span><span lang="fr">Jusqu’à une heure de la journée</span></td></tr>
+        <tr><td><span lang="en">Let Mac Sleep</span><span lang="fr">Laisser le Mac dormir</span></td><td><span lang="en">Stops the session</span><span lang="fr">Arrête la session</span></td></tr>
+      </tbody>
+    </table></div>
+    <p lang="en">With Siri, say for example “<em>Start Dynamic Caffe Island</em>” or “<em>Stop Dynamic Caffe Island</em>”.</p>
+    <p lang="fr">Avec Siri, dites par exemple « <em>Démarrer Dynamic Caffe Island</em> » ou « <em>Arrêter Dynamic Caffe Island</em> ».</p>
+    <div class="tip" lang="en"><strong>Not showing up?</strong> Make sure the app is in <code>/Applications</code> and has been launched once, then give Spotlight a minute to index it.</div>
+    <div class="tip" lang="fr"><strong>Les actions n’apparaissent pas ?</strong> Vérifiez que l’app est dans <code>/Applications</code> et qu’elle a été lancée une fois, puis laissez une minute à Spotlight pour l’indexer.</div>
+  </section>
+
+  <section id="keyboard">
+    <h2 lang="en">Keyboard, Terminal &amp; links</h2><h2 lang="fr">Clavier, Terminal et liens</h2>
+    <div class="grid">
+      <div class="card">
+        <h3 lang="en">Global shortcut</h3><h3 lang="fr">Raccourci global</h3>
+        <p><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>C</kbd></p>
+        <p class="muted" lang="en">Toggles a 30-minute session from any app. No special permission needed.</p>
+        <p class="muted" lang="fr">Active ou arrête une session de 30 minutes depuis n’importe quelle app. Aucune autorisation requise.</p>
+      </div>
+      <div class="card">
+        <h3 lang="en">Terminal</h3><h3 lang="fr">Terminal</h3>
+<pre><code>caffe          # 30 min
+caffe 45       # 45 min
+caffe on       # ∞
+caffe stop
+caffe peek</code></pre>
+        <p class="muted" lang="en">The <code>caffe</code> script lives in <code>scripts/</code>; copy it anywhere on your <code>PATH</code>.</p>
+        <p class="muted" lang="fr">Le script <code>caffe</code> se trouve dans <code>scripts/</code> ; copiez-le dans un dossier de votre <code>PATH</code>.</p>
+      </div>
+    </div>
+    <h3 lang="en"><code>caffe://</code> links</h3><h3 lang="fr">Liens <code>caffe://</code></h3>
+    <p lang="en">Use them from Raycast, Alfred, scripts or a bookmark (<code>open -g "caffe://…"</code> in Terminal).</p>
+    <p lang="fr">À utiliser depuis Raycast, Alfred, des scripts ou un signet (<code>open -g "caffe://…"</code> dans le Terminal).</p>
+    <div class="table-wrap"><table>
+      <tbody>
+        <tr><td><code>caffe://start?minutes=45</code></td><td><span lang="en">45 minutes (also <code>caffe://45</code>)</span><span lang="fr">45 minutes (ou <code>caffe://45</code>)</span></td></tr>
+        <tr><td><code>caffe://until?time=19:45</code></td><td><span lang="en">Until 19:45 (also <code>caffe://until/1945</code>)</span><span lang="fr">Jusqu’à 19:45 (ou <code>caffe://until/1945</code>)</span></td></tr>
+        <tr><td><code>caffe://indefinite</code></td><td><span lang="en">Until you stop it</span><span lang="fr">Jusqu’à l’arrêt</span></td></tr>
+        <tr><td><code>caffe://stop</code> · <code>caffe://toggle</code></td><td><span lang="en">Stop · start/stop 30 min</span><span lang="fr">Arrêter · démarrer/arrêter 30 min</span></td></tr>
+        <tr><td><code>caffe://peek</code> · <code>caffe://pick</code></td><td><span lang="en">Open the island · open the Until window</span><span lang="fr">Ouvrir l’île · ouvrir la fenêtre « Jusqu’à »</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="menu">
+    <h2 lang="en">Menu bar</h2><h2 lang="fr">Barre des menus</h2>
+    <p lang="en">The cup icon in the menu bar shows the remaining time and offers the same controls: presets from 5 minutes to 5 hours (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Until a specific time…</strong>, <strong>Indefinite</strong>, <strong>Stop</strong> (<kbd>⌘D</kbd>) and <strong>Quit</strong> (<kbd>⌘Q</kbd>).</p>
+    <p lang="fr">L’icône de tasse dans la barre des menus affiche le temps restant et propose les mêmes commandes : préréglages de 5 minutes à 5 heures (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Jusqu’à une heure précise…</strong>, <strong>Indéfiniment</strong>, <strong>Arrêter</strong> (<kbd>⌘D</kbd>) et <strong>Quitter</strong> (<kbd>⌘Q</kbd>).</p>
+  </section>
+
+  <section id="languages">
+    <h2 lang="en">Languages</h2><h2 lang="fr">Langues</h2>
+    <p lang="en">The app is available in English and French and follows your Mac’s language. To use a different language just for this app: <strong>System Settings › General › Language &amp; Region › Applications</strong>. Want to add your language? See <a href="../LOCALIZATION.md">the localization guide</a>.</p>
+    <p lang="fr">L’app est disponible en anglais et en français et suit la langue de votre Mac. Pour choisir une autre langue pour cette app uniquement : <strong>Réglages Système › Général › Langue et région › Apps</strong>. Envie d’ajouter votre langue ? Consultez <a href="../LOCALIZATION.md">le guide de localisation</a>.</p>
+  </section>
+
+  <section id="privacy">
+    <h2 lang="en">Privacy &amp; permissions</h2><h2 lang="fr">Confidentialité et autorisations</h2>
+    <ul lang="en">
+      <li><strong>No network access, no analytics, no account.</strong> Nothing leaves your Mac.</li>
+      <li><strong>No special permissions</strong> — no Accessibility, no Screen Recording. The island only follows the pointer position to know when to open.</li>
+      <li>Keeping awake uses the same system mechanism as Apple’s <code>caffeinate</code>. You can verify it in Terminal with <code>pmset -g assertions</code>.</li>
+      <li>Other apps and links can send <code>caffe://</code> commands (that’s what makes automation work). Every start is announced in the island, timed commands are capped at 24 hours, and <strong>Stop</strong> or quitting always ends it.</li>
+    </ul>
+    <ul lang="fr">
+      <li><strong>Aucun accès réseau, aucune statistique, aucun compte.</strong> Rien ne quitte votre Mac.</li>
+      <li><strong>Aucune autorisation particulière</strong> : ni Accessibilité, ni Enregistrement de l’écran. L’île suit seulement la position du pointeur pour savoir quand s’ouvrir.</li>
+      <li>Le maintien en éveil utilise le même mécanisme système que <code>caffeinate</code> d’Apple. Vérifiez-le dans le Terminal avec <code>pmset -g assertions</code>.</li>
+      <li>D’autres apps et des liens peuvent envoyer des commandes <code>caffe://</code> (c’est ce qui permet l’automatisation). Chaque démarrage est annoncé dans l’île, les commandes minutées sont plafonnées à 24 heures, et <strong>Arrêter</strong> ou quitter l’app y met toujours fin.</li>
+    </ul>
+  </section>
+
+  <section id="faq">
+    <h2 lang="en">Troubleshooting</h2><h2 lang="fr">Dépannage</h2>
+    <div lang="en">
+      <h3>My Mac slept anyway with the lid closed</h3>
+      <p>Closing a MacBook lid without an external display always sleeps the Mac; keep-awake prevents <em>idle</em> sleep only.</p>
+      <h3>I don’t see the island</h3>
+      <p>It appears on the main display (the one with the menu bar). Check the app is running — the cup icon is in the menu bar.</p>
+      <h3>Stop everything</h3>
+      <p>Press <strong>Stop</strong>, run <code>caffe stop</code>, or quit the app: quitting always releases the keep-awake.</p>
+    </div>
+    <div lang="fr">
+      <h3>Mon Mac s’est quand même mis en veille capot fermé</h3>
+      <p>Fermer l’écran d’un MacBook sans moniteur externe met toujours le Mac en veille ; l’app n’empêche que la veille <em>par inactivité</em>.</p>
+      <h3>Je ne vois pas l’île</h3>
+      <p>Elle s’affiche sur l’écran principal (celui qui porte la barre des menus). Vérifiez que l’app tourne : l’icône de tasse est dans la barre des menus.</p>
+      <h3>Tout arrêter</h3>
+      <p>Appuyez sur <strong>Arrêter</strong>, lancez <code>caffe stop</code> ou quittez l’app : quitter libère toujours le maintien en éveil.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span lang="en">Dynamic Caffe Island · MIT licence · Screenshots show only the app’s own windows.</span>
+  <span lang="fr">Dynamic Caffe Island · licence MIT · Les captures ne montrent que les fenêtres de l’app.</span>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('.toolbar button');
+    function setLang(lang) {
+      root.lang = lang;
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+      try { localStorage.setItem('dci-lang', lang); } catch (e) {}
+    }
+    var saved = null;
+    try { saved = localStorage.getItem('dci-lang'); } catch (e) {}
+    var preferred = saved || ((navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en');
+    setLang(preferred);
+    buttons.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+  })();
+</script>
+</body>
+</html>

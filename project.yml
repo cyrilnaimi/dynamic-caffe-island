@@ -1,0 +1,92 @@
+# XcodeGen project specification for Dynamic Caffe Island.
+# Regenerate the .xcodeproj with: `xcodegen generate`
+# (Install XcodeGen once via: `brew install xcodegen`)
+#
+# The .xcodeproj is intentionally git-ignored in favor of this YAML so the
+# project remains reproducible and reviewable. See plan.md → Project Structure.
+
+name: DynamicCaffeIsland
+
+options:
+  developmentLanguage: en
+  bundleIdPrefix: ch.dynamic-caffe-island
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    ENABLE_HARDENED_RUNTIME: YES
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGN_IDENTITY: ""
+
+packages:
+  DynamicCaffeIslandPackages:
+    path: Packages
+
+targets:
+  DynamicCaffeIsland:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: App
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleURLTypes:
+          - CFBundleURLName: ch.dynamic-caffe-island.url
+            CFBundleURLSchemes: [caffe]
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_EMIT_LOC_STRINGS: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: ch.dynamic-caffe-island.app
+        PRODUCT_NAME: DynamicCaffeIsland
+        PRODUCT_MODULE_NAME: DynamicCaffeIsland
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES          # menubar-only (activation policy .accessory)
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_CFBundleDisplayName: Dynamic Caffe Island
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Cyril Naimi"
+    dependencies:
+      - package: DynamicCaffeIslandPackages
+        product: ProfileKit
+      - package: DynamicCaffeIslandPackages
+        product: AnimationKit
+      - package: DynamicCaffeIslandPackages
+        product: IslandCore
+      - package: DynamicCaffeIslandPackages
+        product: PowerAssertions
+      - package: DynamicCaffeIslandPackages
+        product: SleepClock
+      - package: DynamicCaffeIslandPackages
+        product: BuiltInProfiles
+
+schemes:
+  DynamicCaffeIsland:
+    build:
+      targets:
+        DynamicCaffeIsland: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    archive:
+      config: Release

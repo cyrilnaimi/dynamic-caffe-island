@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Tiny CLI for Dynamic Caffe Island.
+#   caffe            # 30 minutes
+#   caffe 45         # 45 minutes
+#   caffe on|∞       # indefinitely
+#   caffe stop       # let the Mac sleep
+#   caffe toggle
+set -euo pipefail
+arg="${1:-30}"
+case "$arg" in
+  stop|off)        url="caffe://stop" ;;
+  toggle)          url="caffe://toggle" ;;
+  peek|open)       url="caffe://peek" ;;
+  on|inf|forever|∞) url="caffe://indefinite" ;;
+  *[!0-9]*)        echo "usage: caffe [minutes|on|stop|toggle]" >&2; exit 2 ;;
+  *)               url="caffe://start?minutes=$arg" ;;
+esac
+open -g "$url"
