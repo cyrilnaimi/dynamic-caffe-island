@@ -8,12 +8,15 @@ public struct CaffeinationSession: Sendable, Equatable {
         case preset(TimeInterval)
         case untilClockTime(Date)
         case indefinite
+        /// Until the process `pid` exits (`caffe -- make`, "while Xcode runs").
+        /// `name` is what the UI shows ("Xcode", "make").
+        case whileProcess(pid: Int32, name: String)
     }
 
     public let id: UUID
     public let startedAt: Date
     public let duration: Duration
-    /// `nil` for `.indefinite`.
+    /// `nil` for `.indefinite` and `.whileProcess` (open-ended sessions).
     public let expectedEnd: Date?
 
     public init(id: UUID = UUID(), startedAt: Date = Date(), duration: Duration) {
@@ -27,9 +30,15 @@ public struct CaffeinationSession: Sendable, Equatable {
             // Clamp to >=1 minute in the future.
             let min = startedAt.addingTimeInterval(60)
             self.expectedEnd = max(date, min)
-        case .indefinite:
+        case .indefinite, .whileProcess:
             self.expectedEnd = nil
         }
+    }
+
+    /// The watched process for `.whileProcess` sessions.
+    public var watchedProcess: (pid: Int32, name: String)? {
+        if case let .whileProcess(pid, name) = duration { return (pid, name) }
+        return nil
     }
 
     public func remaining(now: Date = Date()) -> TimeInterval? {

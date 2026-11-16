@@ -1,6 +1,26 @@
+import Darwin
 import Foundation
 import OSLog
 import PowerAssertions
+
+/// Why the last session ended. Lets the UI explain an automatic stop
+/// ("make finished") instead of a generic "coffee's over".
+public enum CaffeineEndReason: Sendable, Equatable {
+    case cancelled
+    case expired
+    case processExited(name: String)
+}
+
+public enum CaffeineSessionError: Error, Equatable, LocalizedError {
+    /// `.whileProcess` was asked for a process that is not running.
+    case processNotRunning(pid: Int32)
+
+    public var errorDescription: String? {
+        switch self {
+        case let .processNotRunning(pid): return "process \(pid) is not running"
+        }
+    }
+}
 
 /// Owns the lifecycle of exactly one caffeine session at a time.
 ///
@@ -21,6 +41,8 @@ public final class CaffeineSessionManager: @unchecked Sendable {
     private var state: CaffeineState = .inactive
     private var assertionHandle: AssertionHandle?
     private var expiryTimer: DispatchSourceTimer?
+    private var processWatch: DispatchSourceProcess?
+    private var endReason: CaffeineEndReason?
     private var listeners: [UUID: Listener] = [:]
 
     public init(client: any PowerAssertionClient = LivePowerAssertionClient(), queue: DispatchQueue = DispatchQueue(label: "ch.dynamic-caffe-island.caffeine.session")) {
@@ -39,13 +61,30 @@ public final class CaffeineSessionManager: @unchecked Sendable {
         currentState.session
     }
 
+    /// Why the most recent session ended (`nil` before any session ended).
+    /// Set before listeners are told about `.inactive`.
+    public var lastEndReason: CaffeineEndReason? {
+        lock.lock(); defer { lock.unlock() }
+        return endReason
+    }
+
+    /// `true` while `pid` exists. `EPERM` means it exists but belongs to
+    /// another user, which still counts as running.
+    public static func isProcessRunning(_ pid: Int32) -> Bool {
+        guard pid > 0 else { return false }
+        return kill(pid, 0) == 0 || errno == EPERM
+    }
+
     // MARK: - Lifecycle
 
     @discardableResult
     public func startSession(duration: CaffeinationSession.Duration, now: Date = Date()) throws -> CaffeinationSession {
         let session = CaffeinationSession(startedAt: now, duration: duration)
+        if let watched = session.watchedProcess, !Self.isProcessRunning(watched.pid) {
+            throw CaffeineSessionError.processNotRunning(pid: watched.pid)
+        }
         let handle = try AssertionHandle(
-            name: "Dynamic Caffe Island — \(session.id.uuidString.prefix(8))",
+            name: "Caffe Island — \(session.id.uuidString.prefix(8))",
             client: client
         )
 
@@ -53,6 +92,8 @@ public final class CaffeineSessionManager: @unchecked Sendable {
         // Cancel any prior session atomically (last-write-wins).
         expiryTimer?.cancel()
         expiryTimer = nil
+        processWatch?.cancel()
+        processWatch = nil
         assertionHandle?.release()
         assertionHandle = handle
         state = .active(session)
@@ -66,8 +107,22 @@ public final class CaffeineSessionManager: @unchecked Sendable {
             timer.resume()
             expiryTimer = timer
         }
+
+        // Event-driven process watch (kqueue NOTE_EXIT) — no polling.
+        if let watched = session.watchedProcess {
+            let source = DispatchSource.makeProcessSource(identifier: watched.pid, eventMask: .exit, queue: queue)
+            source.setEventHandler { [weak self] in self?.processExited(sessionID: session.id) }
+            source.resume()
+            processWatch = source
+        }
         let snapshot = listeners.values
         lock.unlock()
+
+        // The process may have exited between the check above and the
+        // kqueue registration, in which case the source never fires.
+        if let watched = session.watchedProcess, !Self.isProcessRunning(watched.pid) {
+            processExited(sessionID: session.id)
+        }
 
         logger.info("started session id=\(session.id.uuidString.prefix(8), privacy: .public) duration=\(String(describing: duration), privacy: .public)")
         for listener in snapshot { listener(.active(session)) }
@@ -75,15 +130,23 @@ public final class CaffeineSessionManager: @unchecked Sendable {
     }
 
     public func cancelSession(now _: Date = Date()) {
+        endSession(reason: .cancelled)
+    }
+
+    private func endSession(reason: CaffeineEndReason) {
         lock.lock()
+        let hadSession = state.session != nil
         expiryTimer?.cancel()
         expiryTimer = nil
+        processWatch?.cancel()
+        processWatch = nil
         assertionHandle?.release()
         assertionHandle = nil
         state = .inactive
+        if hadSession { endReason = reason }
         let snapshot = listeners.values
         lock.unlock()
-        logger.info("cancelled session")
+        logger.info("ended session reason=\(String(describing: reason), privacy: .public)")
         for listener in snapshot { listener(.inactive) }
     }
 
@@ -121,8 +184,21 @@ public final class CaffeineSessionManager: @unchecked Sendable {
         for listener in listenersSnapshot { listener(.expiring(session)) }
 
         // Schedule release after a short dwell for the view to animate.
+        // Only end *this* session: a new one started during the dwell wins.
         queue.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.cancelSession()
+            guard let self, self.currentSession?.id == session.id else { return }
+            self.endSession(reason: .expired)
         }
+    }
+
+    private func processExited(sessionID: UUID) {
+        lock.lock()
+        guard let session = state.session, session.id == sessionID, let watched = session.watchedProcess else {
+            lock.unlock()
+            return
+        }
+        lock.unlock()
+        logger.info("watched process \(watched.pid) exited")
+        endSession(reason: .processExited(name: watched.name))
     }
 }

@@ -74,4 +74,49 @@ final class CaffeinationSessionTests: XCTestCase {
         let session = CaffeinationSession(startedAt: Date(timeIntervalSinceNow: -3600), duration: .preset(60))
         XCTAssertEqual(session.remaining()?.rounded(), 0)
     }
+
+    // MARK: - While a process runs
+
+    private func spawn(_ path: String, _ args: [String]) throws -> Process {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: path)
+        p.arguments = args
+        try p.run()
+        return p
+    }
+
+    func testWhileProcessEndsWhenProcessExits() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let child = try spawn("/bin/sleep", ["0.3"])
+        let session = try mgr.startSession(duration: .whileProcess(pid: child.processIdentifier, name: "sleep"))
+        XCTAssertNil(session.expectedEnd)
+        XCTAssertEqual(fake.liveTokens.count, 1)
+
+        let ended = expectation(description: "session ends after process exit")
+        let id = mgr.subscribe { if case .inactive = $0 { ended.fulfill() } }
+        // Acceptance: assertion released within 2 s of the process exiting.
+        wait(for: [ended], timeout: 2.3)
+        mgr.unsubscribe(id)
+        XCTAssertEqual(fake.liveTokens.count, 0)
+        XCTAssertEqual(mgr.lastEndReason, .processExited(name: "sleep"))
+    }
+
+    func testWhileProcessAlreadyGoneThrows() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let child = try spawn("/usr/bin/true", [])
+        child.waitUntilExit()
+        XCTAssertThrowsError(try mgr.startSession(duration: .whileProcess(pid: child.processIdentifier, name: "true"))) {
+            XCTAssertEqual($0 as? CaffeineSessionError, .processNotRunning(pid: child.processIdentifier))
+        }
+        XCTAssertEqual(fake.liveTokens.count, 0)
+    }
+
+    func testCancelRecordsReason() throws {
+        let mgr = CaffeineSessionManager(client: FakePowerAssertionClient())
+        _ = try mgr.startSession(duration: .indefinite)
+        mgr.cancelSession()
+        XCTAssertEqual(mgr.lastEndReason, .cancelled)
+    }
 }

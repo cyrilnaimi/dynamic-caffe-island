@@ -10,6 +10,11 @@ public enum CaffeCommand: Equatable, Sendable {
     case toggle
     case peek
     case pickTime
+    /// Keep awake until process `pid` exits.
+    case whileProcess(pid: Int32)
+    /// Keep awake while an app runs — a display name ("Xcode") or bundle id.
+    case whileApp(String)
+    case settings
 
     public static let defaultMinutes = 30
 
@@ -17,7 +22,9 @@ public enum CaffeCommand: Equatable, Sendable {
     ///
     ///   caffe://start?minutes=30   caffe://start/45   caffe://30   caffe://start
     ///   caffe://indefinite         caffe://until?time=19:45   caffe://until/1945
-    ///   caffe://stop  caffe://toggle  caffe://peek  caffe://pick
+    ///   caffe://stop  caffe://toggle  caffe://peek  caffe://pick  caffe://settings
+    ///   caffe://while?pid=123      caffe://while/123
+    ///   caffe://while?app=Xcode    caffe://while?app=com.apple.dt.Xcode
     public static func parse(_ url: URL) -> CaffeCommand? {
         guard url.scheme?.lowercased() == "caffe" else { return nil }
         let host = (url.host ?? "").lowercased()
@@ -32,6 +39,14 @@ public enum CaffeCommand: Equatable, Sendable {
         case "toggle": return .toggle
         case "peek", "open": return .peek
         case "pick", "picker": return .pickTime
+        case "settings", "preferences", "prefs": return .settings
+        case "while":
+            if let app = query("app", "bundle")?.trimmingCharacters(in: .whitespaces), !app.isEmpty {
+                return .whileApp(app)
+            }
+            // pid 0/1 are the kernel and launchd: they never exit.
+            guard let raw = query("pid") ?? firstPath, let pid = Int32(raw), pid > 1 else { return nil }
+            return .whileProcess(pid: pid)
         case "indefinite", "forever", "on": return .indefinite
         case "until", "till":
             guard let text = query("time", "t") ?? firstPath,

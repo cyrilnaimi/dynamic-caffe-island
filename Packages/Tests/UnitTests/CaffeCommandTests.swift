@@ -30,6 +30,28 @@ final class CaffeCommandTests: XCTestCase {
         XCTAssertNil(cmd("https://start"))
     }
 
+    func testWhileVariants() {
+        XCTAssertEqual(cmd("caffe://while?pid=4242"), .whileProcess(pid: 4242))
+        XCTAssertEqual(cmd("caffe://while/4242"), .whileProcess(pid: 4242))
+        XCTAssertEqual(cmd("caffe://while?app=Xcode"), .whileApp("Xcode"))
+        XCTAssertEqual(cmd("caffe://while?bundle=com.apple.dt.Xcode"), .whileApp("com.apple.dt.Xcode"))
+        XCTAssertEqual(cmd("caffe://while?app=Final%20Cut%20Pro"), .whileApp("Final Cut Pro"))
+    }
+
+    func testWhileRejectsBadInput() {
+        XCTAssertNil(cmd("caffe://while"))
+        XCTAssertNil(cmd("caffe://while?pid=abc"))
+        XCTAssertNil(cmd("caffe://while?pid=0"))
+        XCTAssertNil(cmd("caffe://while?pid=1"), "launchd never exits")
+        XCTAssertNil(cmd("caffe://while?pid=-3"))
+        XCTAssertNil(cmd("caffe://while?app=%20"))
+    }
+
+    func testSettings() {
+        XCTAssertEqual(cmd("caffe://settings"), .settings)
+        XCTAssertEqual(cmd("caffe://preferences"), .settings)
+    }
+
     func testUntilVariants() {
         XCTAssertEqual(cmd("caffe://until?time=19:45"), .until(hour: 19, minute: 45))
         XCTAssertEqual(cmd("caffe://until/1945"), .until(hour: 19, minute: 45))
