@@ -54,7 +54,7 @@ jobs:
 
       - name: Verify both architectures
         run: |
-          archs=$(lipo -archs dist/DynamicCaffeIsland.app/Contents/MacOS/DynamicCaffeIsland)
+          archs=$(lipo -archs "dist/Caffe Island.app/Contents/MacOS/Caffe Island")
           echo "architectures: $archs"
           [[ "$archs" == *x86_64* && "$archs" == *arm64* ]]
 
@@ -78,15 +78,15 @@ jobs:
         if: env.HAS_SIGNING == 'true'
         run: |
           codesign --force --deep --options runtime --timestamp \
-            --sign "Developer ID Application" dist/DynamicCaffeIsland.app
-          codesign --verify --strict --verbose=2 dist/DynamicCaffeIsland.app
+            --sign "Developer ID Application" "dist/Caffe Island.app"
+          codesign --verify --strict --verbose=2 "dist/Caffe Island.app"
 
       - name: Package
         run: |
           v=${{ steps.version.outputs.version }}
-          ditto -c -k --keepParent dist/DynamicCaffeIsland.app "dist/DynamicCaffeIsland-$v.zip"
-          mkdir -p dmg && cp -R dist/DynamicCaffeIsland.app dmg/ && ln -s /Applications dmg/Applications
-          hdiutil create -volname "Dynamic Caffe Island" -srcfolder dmg -ov -format UDZO "dist/DynamicCaffeIsland-$v.dmg"
+          ditto -c -k --keepParent "dist/Caffe Island.app" "dist/CaffeIsland-$v.zip"
+          mkdir -p dmg && cp -R "dist/Caffe Island.app" dmg/ && ln -s /Applications dmg/Applications
+          hdiutil create -volname "Caffe Island" -srcfolder dmg -ov -format UDZO "dist/CaffeIsland-$v.dmg"
 
       - name: Notarize + staple
         if: env.HAS_SIGNING == 'true'
@@ -96,10 +96,10 @@ jobs:
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         run: |
           v=${{ steps.version.outputs.version }}
-          codesign --sign "Developer ID Application" --timestamp "dist/DynamicCaffeIsland-$v.dmg"
-          xcrun notarytool submit "dist/DynamicCaffeIsland-$v.dmg" \
+          codesign --sign "Developer ID Application" --timestamp "dist/CaffeIsland-$v.dmg"
+          xcrun notarytool submit "dist/CaffeIsland-$v.dmg" \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" --wait
-          xcrun stapler staple "dist/DynamicCaffeIsland-$v.dmg"
+          xcrun stapler staple "dist/CaffeIsland-$v.dmg"
 
       - name: Checksums
         run: cd dist && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt
@@ -135,7 +135,7 @@ jobs:
       - name: Unpack the released zip
         run: ditto -x -k dist/*.zip "$RUNNER_TEMP/app"
       - name: Launch natively and exercise keep-awake
-        run: scripts/smoke-test.sh "$RUNNER_TEMP/app/DynamicCaffeIsland.app"
+        run: scripts/smoke-test.sh "$RUNNER_TEMP/app/Caffe Island.app"
 
   publish:
     needs: [build, smoke]
@@ -154,5 +154,5 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" dist/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Dynamic Caffe Island ${{ needs.build.outputs.version }}" \
+            --title "Caffe Island ${{ needs.build.outputs.version }}" \
             --generate-notes

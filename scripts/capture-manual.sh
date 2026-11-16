@@ -9,7 +9,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP="${APP:-/Applications/DynamicCaffeIsland.app}"
+APP="${APP:-/Applications/Caffe Island.app}"
 IMG="$ROOT/docs/manual/img"
 mkdir -p "$IMG"
 
@@ -30,7 +30,7 @@ for lang in en fr; do
     en) title="Keep Awake Until" ;;
     fr) title="Garder éveillé jusqu’à" ;;
   esac
-  pkill -x DynamicCaffeIsland 2>/dev/null || true; sleep 1
+  pkill -x "Caffe Island" 2>/dev/null || true; sleep 1
   open "$APP" --args -AppleLanguages "($lang)"; sleep 3
 
   island "$lang-idle"
@@ -56,5 +56,5 @@ for f in glob.glob(sys.argv[1] + "/*-*.png"):
         l, t, r, b = box
         im.crop((max(0, l - 12), t, min(im.width, r + 12), min(im.height, b + 16))).save(f, optimize=True)
 PY
-pkill -x DynamicCaffeIsland; sleep 1; open "$APP"
+pkill -x "Caffe Island"; sleep 1; open "$APP"
 ls -1 "$IMG"

@@ -9,7 +9,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DERIVED="${DERIVED_DATA:-$ROOT/.build-xcode}"
 DIST="$ROOT/dist"
-APP_NAME="DynamicCaffeIsland.app"
+APP_NAME="Caffe Island.app"
 
 cd "$ROOT"
 xcodegen generate --quiet
@@ -36,10 +36,10 @@ echo "** BUILD SUCCEEDED **"
 rm -rf "$DIST" && mkdir -p "$DIST"
 cp -R "$APP" "$DIST/"
 codesign --force --deep --options runtime --sign - "$DIST/$APP_NAME"
-echo "architectures: $(lipo -archs "$DIST/$APP_NAME/Contents/MacOS/DynamicCaffeIsland")"
+echo "architectures: $(lipo -archs "$DIST/$APP_NAME/Contents/MacOS/Caffe Island")"
 
 if [[ "${1:-}" == "--install" ]]; then
-  pkill -x DynamicCaffeIsland 2>/dev/null || true
+  pkill -x "Caffe Island" 2>/dev/null || true
   rm -rf "/Applications/$APP_NAME"
   cp -R "$DIST/$APP_NAME" /Applications/
   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "/Applications/$APP_NAME"

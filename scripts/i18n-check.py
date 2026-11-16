@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Localization lint for Dynamic Caffe Island.
+"""Localization lint for Caffe Island.
 
 Compares the strings the Swift compiler extracted from the app
 (`*.stringsdata`, produced by a build with SWIFT_EMIT_LOC_STRINGS=YES) with

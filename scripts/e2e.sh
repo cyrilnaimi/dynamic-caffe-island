@@ -14,7 +14,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP="${APP:-/Applications/DynamicCaffeIsland.app}"
+APP="${APP:-/Applications/Caffe Island.app}"
 OUT="${OUT:-$ROOT/.e2e}"
 mkdir -p "$OUT"
 pass=0; fail=0
@@ -22,7 +22,7 @@ pass=0; fail=0
 ok()  { echo "  ✅ $1"; pass=$((pass + 1)); }
 ko()  { echo "  ❌ $1"; fail=$((fail + 1)); }
 check() { if eval "$2"; then ok "$1"; else ko "$1"; fi; }
-assertions() { pmset -g assertions | grep -c "Dynamic Caffe Island" || true; }
+assertions() { pmset -g assertions | grep -c "Caffe Island" || true; }
 awake()  { [ "$(assertions)" -gt 0 ]; }
 asleep() { [ "$(assertions)" -eq 0 ]; }
 send() { open -g "$1"; sleep "${2:-1.5}"; }
@@ -48,10 +48,10 @@ for w in l where (w[\"kCGWindowOwnerName\"] as? String)?.contains(\"Caffe\") == 
 }
 
 echo "▶ Launch"
-pkill -x DynamicCaffeIsland 2>/dev/null; sleep 1
+pkill -x "Caffe Island" 2>/dev/null; sleep 1
 open "$APP" --args -AppleLanguages "(en)"; sleep 3
-check "app is running" 'pgrep -x DynamicCaffeIsland >/dev/null'
-archs=$(lipo -archs "$APP/Contents/MacOS/DynamicCaffeIsland")
+check "app is running" 'pgrep -x "Caffe Island" >/dev/null'
+archs=$(lipo -archs "$APP/Contents/MacOS/Caffe Island")
 check "universal binary ($archs)" '[[ "$archs" == *x86_64* && "$archs" == *arm64* ]]'
 check "no assertion at launch" asleep
 shot 01-idle
@@ -116,7 +116,7 @@ if [ -z "${QUICK:-}" ]; then
 fi
 
 echo "▶ Localization (French)"
-pkill -x DynamicCaffeIsland; sleep 1
+pkill -x "Caffe Island"; sleep 1
 open "$APP" --args -AppleLanguages "(fr)"; sleep 3
 send "caffe://pick" 2
 check "French window title 'Garder éveillé jusqu’à'" '[ -n "$(window_id "Garder éveillé jusqu’à")" ]'
@@ -125,12 +125,12 @@ check "French session still keeps Mac awake" awake
 send "caffe://stop"
 
 echo "▶ Footprint"
-pid=$(pgrep -x DynamicCaffeIsland)
+pid=$(pgrep -x "Caffe Island")
 rss=$(ps -o rss= -p "$pid" | tr -d ' ')
 check "resident memory < 80 MB (${rss} KB)" '[ "$rss" -lt 81920 ]'
 
 # Leave the app clean: closes the picker window, no active session.
-pkill -x DynamicCaffeIsland; sleep 1; open "$APP"
+pkill -x "Caffe Island"; sleep 1; open "$APP"
 
 echo
 echo "Result: $pass passed, $fail failed — screenshots in $OUT"

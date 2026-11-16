@@ -1,4 +1,4 @@
-# XcodeGen project specification for Dynamic Caffe Island.
+# XcodeGen project specification for Caffe Island.
 # Regenerate the .xcodeproj with: `xcodegen generate`
 # (Install XcodeGen once via: `brew install xcodegen`)
 #
@@ -56,12 +56,12 @@ targets:
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
         PRODUCT_BUNDLE_IDENTIFIER: ch.dynamic-caffe-island.app
-        PRODUCT_NAME: DynamicCaffeIsland
+        PRODUCT_NAME: Caffe Island            # → "Caffe Island.app"; target/module keep the old internal name
         PRODUCT_MODULE_NAME: DynamicCaffeIsland
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_LSUIElement: YES          # menubar-only (activation policy .accessory)
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
-        INFOPLIST_KEY_CFBundleDisplayName: Dynamic Caffe Island
+        INFOPLIST_KEY_CFBundleDisplayName: Caffe Island
         INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Cyril Naimi"
     dependencies:
       - package: DynamicCaffeIslandPackages

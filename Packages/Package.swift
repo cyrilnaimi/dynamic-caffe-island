@@ -1,6 +1,6 @@
 // swift-tools-version: 5.9
 //
-// Dynamic Caffe Island — SwiftPM workspace for the plugin contract and the
+// Caffe Island — SwiftPM workspace for the plugin contract and the
 // two built-in profiles. The app target (`App/`) lives in the Xcode project
 // at the repo root and consumes this package.
 

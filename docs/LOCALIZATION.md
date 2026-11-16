@@ -1,6 +1,6 @@
 # Localization guide
 
-Dynamic Caffe Island ships in **English** (source language) and **French**.
+Caffe Island ships in **English** (source language) and **French**.
 Adding a language is one of the most welcome contributions — no Swift
 knowledge needed for translators.
 
@@ -35,8 +35,7 @@ dates are formatted by Foundation and are localized automatically — they are
 - **Keep placeholders exactly**: `%@`, `%lld`, `${duration}`, `${minutes}`,
   `${time}`, `${applicationName}`. You may move them inside the sentence,
   never drop or rename them. The lint below fails on mismatches.
-- **Never translate the product name** "Caffe Island" / "Dynamic Caffe
-  Island".
+- **Never translate the product name** "Caffe Island".
 - **Island chips are tiny** (`15m`, `30m`, `1h`, `2h`, `Until…`, `Stop`):
   stay within ~8 characters. Use your language's usual short unit
   ("15 min", "1 Std.").
@@ -81,7 +80,7 @@ python3 scripts/i18n-check.py          # missing / stale / untranslated / placeh
 Run the app in your language without changing the system language:
 
 ```bash
-open build/dd/Build/Products/Debug/DynamicCaffeIsland.app --args -AppleLanguages "(de)"
+open "build/dd/Build/Products/Debug/Caffe Island.app" --args -AppleLanguages "(de)"
 open -g "caffe://peek"                 # expanded island
 open -g "caffe://start?minutes=30"     # start toast + live pill
 open -g "caffe://pick"                 # Until window

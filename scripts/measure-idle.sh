@@ -27,8 +27,8 @@ MAX_CPU="1.0"           # %, arithmetic mean of per-second samples
 MAX_RSS=50              # MB, arithmetic mean of per-second samples
 WARMUP=30               # seconds excluded from the mean
 SPIKE_MULTIPLIER=2      # per-sample CPU ceiling as multiple of MAX_CPU
-APP_PATH="${APP_PATH:-DerivedData/Build/Products/Debug/DynamicCaffeIsland.app}"
-PROCESS_NAME="${PROCESS_NAME:-DynamicCaffeIsland}"
+APP_PATH="${APP_PATH:-DerivedData/Build/Products/Debug/Caffe Island.app}"
+PROCESS_NAME="${PROCESS_NAME:-Caffe Island}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
