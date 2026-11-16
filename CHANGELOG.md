@@ -1,12 +1,40 @@
 # Changelog
 
-All notable changes to Dynamic Caffe Island are recorded here. The format
+All notable changes to Caffe Island are recorded here. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Changed
+
+- Renamed to **Caffe Island** (app, menu, Spotlight, DMG volume, release
+  assets). Bundle id and `caffe://` scheme are unchanged.
+- Menu bar icon is now the app's mug (template glyph from
+  `scripts/make-icon.swift --menubar`); classic cup and timer-only styles.
+- ⌃⌥C and `caffe toggle` use the default duration from Settings.
+
 ### Added
+
+- Settings window (⌘,, menu, `caffe://settings`, re-opening the app).
+- Island styles: notch, floating pill below the menu bar, automatic; hide
+  when idle with a top-centre hot zone.
+- Multiple displays: main display, display with the pointer / active window,
+  or all displays, each with its own notch / no-notch geometry.
+- The island hides while a full-screen app is in front (event-driven; hide,
+  alerts only or show).
+- Keep awake while a process or app runs: `caffe -- CMD`, `caffe -w PID`,
+  `caffe --app NAME`, `caffe://while?pid=|app=`, menu submenu, Spotlight
+  action. Ends within moments of the exit with a message.
+- Battery guard: stop below 10/20/30 % or when unplugged.
+- Open at login (`SMAppService`), never starting a session by itself.
+- Option to hide the menu bar item.
+- Plugin bundles are verified before loading: valid code signature against
+  a Developer ID team requirement, user-owned non-writable directory, no
+  escaping symlinks, user approval hook.
+- Accessibility: VoiceOver labels for the island strip, toast and countdown,
+  Reduce Motion for toasts and steam, higher-contrast secondary text, rolling
+  digits on macOS 14+.
 
 - Phase 1 scaffolding — repo layout, SwiftPM workspace (`Packages/`) with six
   library targets (`ProfileKit`, `AnimationKit`, `IslandCore`,
@@ -43,6 +71,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Developer ID signing + notarization); Dependabot for actions.
 
 ### Fixed
+
+- Menu bar timer changed width as digits changed, and froze during a
+  session; it now has a fixed width and ticks.
+- A session started during the 0.6 s expiry dwell of the previous one was
+  cancelled.
 
 - Island never rendered (leftover debug view in the panel).
 - Possible deadlock reading `pmset`/`defaults` output (pipe drained after

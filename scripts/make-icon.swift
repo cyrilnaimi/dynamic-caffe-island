@@ -1,5 +1,5 @@
 #!/usr/bin/env swift
-// Renders the Dynamic Caffe Island app icon (1024×1024 PNG) with pure
+// Renders the Caffe Island app icon (1024×1024 PNG) with pure
 // CoreGraphics — no SF Symbols (their licence forbids use in app icons), no
 // text. Concept: a wide-awake, over-caffeinated mug on a tiny island at
 // night, with the Dynamic Island pill floating at the top.
@@ -7,6 +7,11 @@
 //   swift scripts/make-icon.swift App/Assets.xcassets/AppIcon.appiconset
 //
 // Writes icon_1024.png plus every size macOS needs, and Contents.json.
+//
+//   swift scripts/make-icon.swift --menubar App/Assets.xcassets
+//
+// Writes the menu bar glyphs (18×18 pt template images, 1× and 2×): the
+// googly-eyed mug, idle (outline), active (filled + steam) and error (badge).
 import AppKit
 import CoreGraphics
 
@@ -167,6 +172,95 @@ func writePNG(_ image: CGImage, size: Int, to path: String) {
     g.cgContext.draw(image, in: CGRect(x: 0, y: 0, width: size, height: size))
     NSGraphicsContext.restoreGraphicsState()
     try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: path))
+}
+
+// MARK: - Menu bar glyphs
+
+enum GlyphState: String, CaseIterable { case idle = "MenuBarMug", active = "MenuBarMugActive", error = "MenuBarMugError" }
+
+/// Draws one 18×18 pt glyph, black on transparent (template: only alpha
+/// matters, macOS tints it for light/dark/highlighted menu bars).
+func renderGlyph(_ state: GlyphState, scale: CGFloat) -> CGImage {
+    let px = Int(18 * scale)
+    let cs = CGColorSpace(name: CGColorSpace.sRGB)!
+    let ctx = CGContext(data: nil, width: px, height: px, bitsPerComponent: 8, bytesPerRow: 0, space: cs,
+                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+    ctx.scaleBy(x: scale, y: scale)
+    ctx.translateBy(x: 0, y: 18); ctx.scaleBy(x: 1, y: -1)     // top-left origin, points
+    ctx.setShouldAntialias(true)
+    let ink = CGColor(gray: 0, alpha: 1)
+    ctx.setStrokeColor(ink); ctx.setFillColor(ink)
+    ctx.setLineCap(.round); ctx.setLineJoin(.round)
+
+    // Mug body: flat rim, rounded bottom. Steam leaves room above it.
+    let body = CGMutablePath()
+    body.move(to: CGPoint(x: 2.75, y: 6.25))
+    body.addLine(to: CGPoint(x: 12.75, y: 6.25))
+    body.addLine(to: CGPoint(x: 12.75, y: 12.5))
+    body.addQuadCurve(to: CGPoint(x: 9.75, y: 15.5), control: CGPoint(x: 12.75, y: 15.5))
+    body.addLine(to: CGPoint(x: 5.75, y: 15.5))
+    body.addQuadCurve(to: CGPoint(x: 2.75, y: 12.5), control: CGPoint(x: 2.75, y: 15.5))
+    body.closeSubpath()
+    // Handle: a "D" on the right.
+    let handle = CGMutablePath()
+    handle.move(to: CGPoint(x: 12.75, y: 8.0))
+    handle.addCurve(to: CGPoint(x: 12.75, y: 12.75), control1: CGPoint(x: 16.6, y: 7.6), control2: CGPoint(x: 16.6, y: 13.2))
+    let eyes = [CGRect(x: 4.6, y: 8.5, width: 2.4, height: 2.4), CGRect(x: 8.4, y: 8.5, width: 2.4, height: 2.4)]
+
+    ctx.setLineWidth(1.5)
+    ctx.addPath(handle); ctx.strokePath()
+    switch state {
+    case .active:
+        ctx.addPath(body); ctx.drawPath(using: .fillStroke)          // stroke keeps edges pixel-aligned
+        ctx.setBlendMode(.clear)                                   // knock the eyes out
+        for e in eyes { ctx.fillEllipse(in: e) }
+        ctx.setBlendMode(.normal)
+        ctx.setLineWidth(1.2)
+        for x in [5.0, 7.75, 10.5] as [CGFloat] {                  // three wisps of steam
+            ctx.move(to: CGPoint(x: x, y: 4.4))
+            ctx.addCurve(to: CGPoint(x: x, y: 0.9), control1: CGPoint(x: x - 1.1, y: 3.3), control2: CGPoint(x: x + 1.1, y: 2.0))
+        }
+        ctx.strokePath()
+    case .idle, .error:
+        ctx.addPath(body); ctx.strokePath()
+        for e in eyes { ctx.fillEllipse(in: e) }
+    }
+    if state == .error {
+        // Badge bottom-right: clear a ring, then a solid dot with a "!" cut out.
+        let c = CGPoint(x: 14.0, y: 14.0)
+        ctx.setBlendMode(.clear)
+        ctx.fillEllipse(in: CGRect(x: c.x - 4.6, y: c.y - 4.6, width: 9.2, height: 9.2))
+        ctx.setBlendMode(.normal)
+        ctx.fillEllipse(in: CGRect(x: c.x - 3.6, y: c.y - 3.6, width: 7.2, height: 7.2))
+        ctx.setBlendMode(.clear)
+        ctx.setLineWidth(1.3)
+        ctx.move(to: CGPoint(x: c.x, y: c.y - 2.0)); ctx.addLine(to: CGPoint(x: c.x, y: c.y + 0.4)); ctx.strokePath()
+        ctx.fillEllipse(in: CGRect(x: c.x - 0.7, y: c.y + 1.3, width: 1.4, height: 1.4))
+        ctx.setBlendMode(.normal)
+    }
+    return ctx.makeImage()!
+}
+
+func writeMenuBarGlyphs(into catalog: String) {
+    for state in GlyphState.allCases {
+        let dir = "\(catalog)/\(state.rawValue).imageset"
+        try! FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        var images: [String] = []
+        for scale in [1, 2] {
+            let name = "\(state.rawValue)\(scale == 2 ? "@2x" : "").png"
+            let rep = NSBitmapImageRep(cgImage: renderGlyph(state, scale: CGFloat(scale)))
+            try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: "\(dir)/\(name)"))
+            images.append(#"{"idiom":"universal","scale":"\#(scale)x","filename":"\#(name)"}"#)
+        }
+        let json = #"{"images":[\#(images.joined(separator: ","))],"info":{"version":1,"author":"xcode"},"properties":{"template-rendering-intent":"template"}}"#
+        try! json.write(toFile: "\(dir)/Contents.json", atomically: true, encoding: .utf8)
+    }
+    print("wrote menu bar glyphs to \(catalog)")
+}
+
+if CommandLine.arguments.dropFirst().first == "--menubar" {
+    writeMenuBarGlyphs(into: CommandLine.arguments.dropFirst(2).first ?? "App/Assets.xcassets")
+    exit(0)
 }
 
 try! FileManager.default.createDirectory(atPath: outDir, withIntermediateDirectories: true)

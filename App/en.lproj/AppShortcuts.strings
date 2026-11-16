@@ -6,3 +6,4 @@
 "Keep awake with ${applicationName} for ${duration}" = "Keep awake with ${applicationName} for ${duration}";
 "Stop ${applicationName}" = "Stop ${applicationName}";
 "Let my Mac sleep with ${applicationName}" = "Let my Mac sleep with ${applicationName}";
+"Keep awake while an app runs with ${applicationName}" = "Keep awake while an app runs with ${applicationName}";

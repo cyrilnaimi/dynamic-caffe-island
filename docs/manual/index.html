@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dynamic Caffe Island Manual</title>
-<meta name="description" content="User manual for Dynamic Caffe Island — keep your Mac awake from a Dynamic Island.">
+<title>Caffe Island Manual</title>
+<meta name="description" content="User manual for Caffe Island — keep your Mac awake from a Dynamic Island.">
 <link rel="icon" href="img/icon.png">
 <style>
   :root {
@@ -88,8 +88,8 @@
 </div>
 
 <header class="hero">
-  <img class="icon" src="img/icon.png" alt="Dynamic Caffe Island icon: a wide-awake coffee mug on a tiny island">
-  <h1>Dynamic Caffe Island</h1>
+  <img class="icon" src="img/icon.png" alt="Caffe Island icon: a wide-awake coffee mug on a tiny island">
+  <h1>Caffe Island</h1>
   <p lang="en">Keep your Mac awake — right from a Dynamic Island. Even if your Mac has no notch.</p>
   <p lang="fr">Gardez votre Mac éveillé, directement depuis une Dynamic Island. Même si votre Mac n’a pas d’encoche.</p>
   <div class="island">
@@ -150,8 +150,8 @@
 
   <section id="island">
     <h2 lang="en">Meet the island</h2><h2 lang="fr">Découvrir l’île</h2>
-    <p lang="en">A small black island hangs from the top centre of your main screen. On a MacBook with a notch it wraps around the real notch; on any other Mac it <strong>simulates one</strong>. When nothing is running it quietly shows how long until the screensaver, display sleep or system sleep kicks in.</p>
-    <p lang="fr">Une petite île noire est suspendue en haut au centre de votre écran principal. Sur un MacBook à encoche, elle entoure la vraie encoche ; sur les autres Mac, elle <strong>en simule une</strong>. Au repos, elle indique discrètement dans combien de temps l’économiseur d’écran, la veille de l’écran ou du Mac se déclenche.</p>
+    <p lang="en">A small black island hangs from the top centre of your main screen. On a MacBook with a notch it wraps around the real notch; on any other Mac it <strong>simulates one</strong> (or floats as a pill below the menu bar, see Settings). It steps aside while a full-screen app is in front. When nothing is running it quietly shows how long until the screensaver, display sleep or system sleep kicks in.</p>
+    <p lang="fr">Une petite île noire est suspendue en haut au centre de votre écran principal. Sur un MacBook à encoche, elle entoure la vraie encoche ; sur les autres Mac, elle <strong>en simule une</strong> (ou flotte en pastille sous la barre des menus, voir les Réglages). Elle s’efface quand une app en plein écran est au premier plan. Au repos, elle indique discrètement dans combien de temps l’économiseur d’écran, la veille de l’écran ou du Mac se déclenche.</p>
     <figure>
       <div class="shot"><img lang="en" src="img/en-idle.png" width="198" alt="Idle island with sleep countdown"><img lang="fr" src="img/fr-idle.png" width="198" alt="Île au repos avec compte à rebours de veille"></div>
       <figcaption lang="en">Idle: dim cup on the left, time until sleep on the right.</figcaption>
@@ -217,11 +217,12 @@
         <tr><td><span lang="en">Keep Mac Awake</span><span lang="fr">Garder le Mac éveillé</span></td><td><span lang="en">15 min, 30 min, 1 h, 2 h or indefinitely</span><span lang="fr">15 min, 30 min, 1 h, 2 h ou indéfiniment</span></td></tr>
         <tr><td><span lang="en">Keep Mac Awake for Minutes</span><span lang="fr">Garder le Mac éveillé (minutes)</span></td><td><span lang="en">Any number of minutes (1–1440)</span><span lang="fr">N’importe quel nombre de minutes (1 à 1440)</span></td></tr>
         <tr><td><span lang="en">Keep Mac Awake Until</span><span lang="fr">Garder le Mac éveillé jusqu’à</span></td><td><span lang="en">Until a time of day</span><span lang="fr">Jusqu’à une heure de la journée</span></td></tr>
+        <tr><td><span lang="en">Keep Mac Awake While App Runs</span><span lang="fr">Garder le Mac éveillé tant qu’une app tourne</span></td><td><span lang="en">Until the app you name quits</span><span lang="fr">Jusqu’à ce que l’app indiquée soit quittée</span></td></tr>
         <tr><td><span lang="en">Let Mac Sleep</span><span lang="fr">Laisser le Mac dormir</span></td><td><span lang="en">Stops the session</span><span lang="fr">Arrête la session</span></td></tr>
       </tbody>
     </table></div>
-    <p lang="en">With Siri, say for example “<em>Start Dynamic Caffe Island</em>” or “<em>Stop Dynamic Caffe Island</em>”.</p>
-    <p lang="fr">Avec Siri, dites par exemple « <em>Démarrer Dynamic Caffe Island</em> » ou « <em>Arrêter Dynamic Caffe Island</em> ».</p>
+    <p lang="en">With Siri, say for example “<em>Start Caffe Island</em>” or “<em>Stop Caffe Island</em>”.</p>
+    <p lang="fr">Avec Siri, dites par exemple « <em>Démarrer Caffe Island</em> » ou « <em>Arrêter Caffe Island</em> ».</p>
     <div class="tip" lang="en"><strong>Not showing up?</strong> Make sure the app is in <code>/Applications</code> and has been launched once, then give Spotlight a minute to index it.</div>
     <div class="tip" lang="fr"><strong>Les actions n’apparaissent pas ?</strong> Vérifiez que l’app est dans <code>/Applications</code> et qu’elle a été lancée une fois, puis laissez une minute à Spotlight pour l’indexer.</div>
   </section>
@@ -232,16 +233,20 @@
       <div class="card">
         <h3 lang="en">Global shortcut</h3><h3 lang="fr">Raccourci global</h3>
         <p><kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>C</kbd></p>
-        <p class="muted" lang="en">Toggles a 30-minute session from any app. No special permission needed.</p>
-        <p class="muted" lang="fr">Active ou arrête une session de 30 minutes depuis n’importe quelle app. Aucune autorisation requise.</p>
+        <p class="muted" lang="en">Toggles a session of the default duration (30 minutes; change it in Settings) from any app. No special permission needed.</p>
+        <p class="muted" lang="fr">Active ou arrête une session de la durée par défaut (30 minutes, modifiable dans les Réglages) depuis n’importe quelle app. Aucune autorisation requise.</p>
       </div>
       <div class="card">
         <h3 lang="en">Terminal</h3><h3 lang="fr">Terminal</h3>
-<pre><code>caffe          # 30 min
-caffe 45       # 45 min
-caffe on       # ∞
+<pre><code>caffe              # 30 min
+caffe 45           # 45 min
+caffe on           # ∞
+caffe until 19:45
+caffe -- make test # while the command runs
+caffe -w 4242      # while process 4242 runs
+caffe --app Xcode  # while Xcode runs
 caffe stop
-caffe peek</code></pre>
+caffe settings</code></pre>
         <p class="muted" lang="en">The <code>caffe</code> script lives in <code>scripts/</code>; copy it anywhere on your <code>PATH</code>.</p>
         <p class="muted" lang="fr">Le script <code>caffe</code> se trouve dans <code>scripts/</code> ; copiez-le dans un dossier de votre <code>PATH</code>.</p>
       </div>
@@ -254,16 +259,43 @@ caffe peek</code></pre>
         <tr><td><code>caffe://start?minutes=45</code></td><td><span lang="en">45 minutes (also <code>caffe://45</code>)</span><span lang="fr">45 minutes (ou <code>caffe://45</code>)</span></td></tr>
         <tr><td><code>caffe://until?time=19:45</code></td><td><span lang="en">Until 19:45 (also <code>caffe://until/1945</code>)</span><span lang="fr">Jusqu’à 19:45 (ou <code>caffe://until/1945</code>)</span></td></tr>
         <tr><td><code>caffe://indefinite</code></td><td><span lang="en">Until you stop it</span><span lang="fr">Jusqu’à l’arrêt</span></td></tr>
-        <tr><td><code>caffe://stop</code> · <code>caffe://toggle</code></td><td><span lang="en">Stop · start/stop 30 min</span><span lang="fr">Arrêter · démarrer/arrêter 30 min</span></td></tr>
+        <tr><td><code>caffe://while?pid=4242</code></td><td><span lang="en">Until process 4242 exits</span><span lang="fr">Jusqu’à la fin du processus 4242</span></td></tr>
+        <tr><td><code>caffe://while?app=Xcode</code></td><td><span lang="en">Until Xcode quits (name or bundle id)</span><span lang="fr">Jusqu’à ce que Xcode soit quitté (nom ou identifiant)</span></td></tr>
+        <tr><td><code>caffe://stop</code> · <code>caffe://toggle</code></td><td><span lang="en">Stop · start/stop the default duration</span><span lang="fr">Arrêter · démarrer/arrêter la durée par défaut</span></td></tr>
         <tr><td><code>caffe://peek</code> · <code>caffe://pick</code></td><td><span lang="en">Open the island · open the Until window</span><span lang="fr">Ouvrir l’île · ouvrir la fenêtre « Jusqu’à »</span></td></tr>
+        <tr><td><code>caffe://settings</code></td><td><span lang="en">Open Settings</span><span lang="fr">Ouvrir les Réglages</span></td></tr>
       </tbody>
     </table></div>
   </section>
 
+  <section id="while">
+    <h2 lang="en">While an app or command runs</h2><h2 lang="fr">Tant qu’une app ou une commande tourne</h2>
+    <p lang="en">Don’t guess how long a build, a download or a long test run will take. Pick an app in the menu bar under <strong>While an App Runs</strong>, use the Spotlight action, or prefix a command with <code>caffe --</code>. The island shows the app’s icon, and the session ends by itself, with a short message, as soon as the app or command exits.</p>
+    <p lang="fr">Inutile de deviner la durée d’une compilation, d’un téléchargement ou d’une longue série de tests. Choisissez une app dans la barre des menus sous <strong>Tant qu’une app tourne</strong>, utilisez l’action Spotlight, ou préfixez une commande par <code>caffe --</code>. L’île affiche l’icône de l’app, et la session se termine d’elle-même, avec un court message, dès que l’app ou la commande se termine.</p>
+  </section>
+
   <section id="menu">
     <h2 lang="en">Menu bar</h2><h2 lang="fr">Barre des menus</h2>
-    <p lang="en">The cup icon in the menu bar shows the remaining time and offers the same controls: presets from 5 minutes to 5 hours (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Until a specific time…</strong>, <strong>Indefinite</strong>, <strong>Stop</strong> (<kbd>⌘D</kbd>) and <strong>Quit</strong> (<kbd>⌘Q</kbd>).</p>
-    <p lang="fr">L’icône de tasse dans la barre des menus affiche le temps restant et propose les mêmes commandes : préréglages de 5 minutes à 5 heures (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Jusqu’à une heure précise…</strong>, <strong>Indéfiniment</strong>, <strong>Arrêter</strong> (<kbd>⌘D</kbd>) et <strong>Quitter</strong> (<kbd>⌘Q</kbd>).</p>
+    <p lang="en">The mug icon in the menu bar shows the remaining time and offers the same controls: presets from 5 minutes to 5 hours (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Until a specific time…</strong>, <strong>Indefinite</strong>, <strong>While an App Runs</strong>, <strong>Stop</strong> (<kbd>⌘D</kbd>), <strong>Open at Login</strong>, <strong>Settings…</strong> (<kbd>⌘,</kbd>) and <strong>Quit</strong> (<kbd>⌘Q</kbd>). The item keeps a fixed width, so neighbouring icons don’t move as the seconds tick.</p>
+    <p lang="fr">L’icône de mug dans la barre des menus affiche le temps restant et propose les mêmes commandes : préréglages de 5 minutes à 5 heures (<kbd>⌘1</kbd>–<kbd>⌘6</kbd>), <strong>Jusqu’à une heure précise…</strong>, <strong>Indéfiniment</strong>, <strong>Tant qu’une app tourne</strong>, <strong>Arrêter</strong> (<kbd>⌘D</kbd>), <strong>Ouvrir à la connexion</strong>, <strong>Réglages…</strong> (<kbd>⌘,</kbd>) et <strong>Quitter</strong> (<kbd>⌘Q</kbd>). L’icône garde une largeur fixe : les icônes voisines ne bougent pas au fil des secondes.</p>
+  </section>
+
+  <section id="settings">
+    <h2 lang="en">Settings</h2><h2 lang="fr">Réglages</h2>
+    <p lang="en">Open Settings from the menu (<kbd>⌘,</kbd>), with <code>caffe settings</code>, or by opening the app again from Spotlight or Finder while it runs. Every change applies immediately.</p>
+    <p lang="fr">Ouvrez les Réglages depuis le menu (<kbd>⌘,</kbd>), avec <code>caffe settings</code>, ou en rouvrant l’app depuis Spotlight ou le Finder pendant qu’elle tourne. Chaque modification s’applique immédiatement.</p>
+    <ul lang="en">
+      <li><strong>General</strong>: open at login (it never keeps the Mac awake by itself), default duration for <kbd>⌃⌥C</kbd> and <code>caffe toggle</code>, turn the shortcut off.</li>
+      <li><strong>Island</strong>: style (<em>Notch</em>, <em>Floating pill</em> below the menu bar so it never covers menu items, or <em>Automatic</em>: notch where there is a real one, pill elsewhere), <em>Hide when idle</em> (point at the top centre of the screen to bring it back), which display (main, the one with the pointer, or all), and what to do over full-screen apps (hide, alerts only, show).</li>
+      <li><strong>Menu Bar</strong>: hide the item (the island, Spotlight, <kbd>⌃⌥C</kbd>, links and the CLI keep working; open the app again to get back to Settings), icon (mug, classic cup, timer only), keep a fixed width even when idle.</li>
+      <li><strong>Battery</strong>: stop below 10, 20 or 30 % on battery, or keep awake only on the power adapter. A message explains why the session ended. No effect on Macs without a battery.</li>
+    </ul>
+    <ul lang="fr">
+      <li><strong>Général</strong> : ouvrir à la connexion (cela ne garde jamais le Mac éveillé à soi seul), durée par défaut de <kbd>⌃⌥C</kbd> et <code>caffe toggle</code>, désactiver le raccourci.</li>
+      <li><strong>Île</strong> : style (<em>Encoche</em>, <em>Pastille flottante</em> sous la barre des menus pour ne jamais masquer les menus, ou <em>Automatique</em> : encoche là où il y en a une vraie, pastille ailleurs), <em>Masquer au repos</em> (pointez en haut au centre de l’écran pour la faire revenir), écran (principal, celui du pointeur, ou tous), et comportement au-dessus des apps en plein écran (masquer, alertes uniquement, afficher).</li>
+      <li><strong>Barre des menus</strong> : masquer l’icône (l’île, Spotlight, <kbd>⌃⌥C</kbd>, les liens et le Terminal restent disponibles ; rouvrez l’app pour revenir aux Réglages), icône (mug, tasse classique, minuteur seul), largeur fixe même au repos.</li>
+      <li><strong>Batterie</strong> : arrêter sous 10, 20 ou 30 % sur batterie, ou ne garder éveillé que sur secteur. Un message explique l’arrêt. Sans effet sur les Mac sans batterie.</li>
+    </ul>
   </section>
 
   <section id="languages">
@@ -310,8 +342,8 @@ caffe peek</code></pre>
 </main>
 
 <footer>
-  <span lang="en">Dynamic Caffe Island · MIT licence · Screenshots show only the app’s own windows.</span>
-  <span lang="fr">Dynamic Caffe Island · licence MIT · Les captures ne montrent que les fenêtres de l’app.</span>
+  <span lang="en">Caffe Island · MIT licence · Screenshots show only the app’s own windows.</span>
+  <span lang="fr">Caffe Island · licence MIT · Les captures ne montrent que les fenêtres de l’app.</span>
 </footer>
 
 <script>

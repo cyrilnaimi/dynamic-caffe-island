@@ -92,6 +92,29 @@ struct StartCaffeUntilIntent: AppIntent {
     }
 }
 
+struct StartCaffeWhileAppIntent: AppIntent {
+    static var title: LocalizedStringResource = "Keep Mac Awake While App Runs"
+    static var description = IntentDescription("Keeps the Mac awake until an app quits.")
+    static var openAppWhenRun: Bool = false
+
+    @Parameter(title: "App", requestValueDialog: "Which app?")
+    var app: String
+
+    static var parameterSummary: some ParameterSummary {
+        Summary("Keep Mac awake while \(\.$app) runs")
+    }
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        await AppRuntime.shared.ensureStarted()
+        AppRuntime.shared.keepAwake(whileApp: app)
+        guard let process = AppRuntime.shared.state.caffeineState.session?.watchedProcess else {
+            return .result(dialog: "\(app) isn’t running")
+        }
+        return .result(dialog: "☕ Awake while \(process.name) runs")
+    }
+}
+
 struct StopCaffeIntent: AppIntent {
     static var title: LocalizedStringResource = "Let Mac Sleep"
     static var description = IntentDescription("Stops the caffeine timer.")
@@ -116,6 +139,14 @@ struct CaffeShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Keep Mac Awake",
             systemImageName: "cup.and.saucer.fill"
+        )
+        AppShortcut(
+            intent: StartCaffeWhileAppIntent(),
+            phrases: [
+                "Keep awake while an app runs with \(.applicationName)",
+            ],
+            shortTitle: "Keep Awake While App Runs",
+            systemImageName: "app.badge.checkmark"
         )
         AppShortcut(
             intent: StopCaffeIntent(),

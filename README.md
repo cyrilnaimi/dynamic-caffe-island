@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/manual/img/icon.png" width="128" alt="Dynamic Caffe Island icon">
+  <img src="docs/manual/img/icon.png" width="128" alt="Caffe Island icon">
 </p>
 
-<h1 align="center">Dynamic Caffe Island</h1>
+<h1 align="center">Caffe Island</h1>
 
 <p align="center">
   Keep your Mac awake — from a Dynamic Island.<br>
@@ -20,10 +20,15 @@
 - **Keep awake in one hover.** 15 min, 30 min, 1 h, 2 h, ∞ or **until a
   specific time** (a time already passed today means tomorrow). `+15m` / `+1h`
   while running, one-click **Stop**.
-- **Live countdown** in the island and the menu bar — and, when idle, how long
-  until the screensaver / display sleep.
+- **While an app or command runs**: `caffe -- make test`, `caffe --app Xcode`,
+  or pick an app in the menu. Ends by itself when it exits.
+- **Live countdown** in the island and a fixed-width menu bar item — and, when
+  idle, how long until the screensaver / display sleep.
+- **Settings** (<kbd>⌘,</kbd>): notch or floating pill, hide when idle, which
+  display, hide over full-screen apps, hide the menu bar item, open at login,
+  battery guard.
 - **Spotlight, Siri & Shortcuts** actions: *Keep Mac Awake*, *…for Minutes*,
-  *…Until*, *Let Mac Sleep*.
+  *…Until*, *…While App Runs*, *Let Mac Sleep*.
 - **Automation**: global hotkey <kbd>⌃⌥C</kbd>, `caffe://` URLs, and a tiny
   `caffe` CLI.
 - **Tiny footprint**: under 1 % CPU, ~15 MB RAM, no network, no special
@@ -49,6 +54,7 @@ scripts/build-release.sh --install     # universal Release build → /Applicatio
 
 ```bash
 caffe 45                                # 45 minutes   (scripts/caffe)
+caffe -- swift test                     # while the command runs
 open -g "caffe://until?time=19:45"      # until 19:45
 open -g "caffe://stop"
 ```
@@ -58,8 +64,9 @@ open -g "caffe://stop"
 | `caffe://start?minutes=N` · `caffe://N` | Keep awake N minutes (1–1440) |
 | `caffe://until?time=HH:MM` · `caffe://until/HHMM` | Until a time of day |
 | `caffe://indefinite` | Until stopped |
-| `caffe://stop` · `caffe://toggle` | Stop · toggle 30 min |
-| `caffe://peek` · `caffe://pick` | Open the island · open the Until window |
+| `caffe://while?pid=PID` · `caffe://while?app=NAME` | While a process / app runs |
+| `caffe://stop` · `caffe://toggle` | Stop · toggle the default duration |
+| `caffe://peek` · `caffe://pick` · `caffe://settings` | Open the island · the Until window · Settings |
 
 ## Develop
 

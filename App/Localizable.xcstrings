@@ -2,6 +2,38 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "%@ finished. Your Mac can sleep": {
+      "comment": "Toast when the watched app/command exits; %@ is its name (“Xcode”, “make”).",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ est terminé. Votre Mac peut dormir"
+          }
+        }
+      }
+    },
+    "%@ isn’t running": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ n’est pas ouvert"
+          }
+        }
+      }
+    },
+    "%@ remaining": {
+      "comment": "VoiceOver label of the big countdown; %@ is a duration like “12 min”.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ restantes"
+          }
+        }
+      }
+    },
     "+1 hour": {
       "localizations": {
         "fr": {
@@ -146,6 +178,78 @@
         }
       }
     },
+    "All displays": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tous les écrans"
+          }
+        }
+      }
+    },
+    "Allow Caffe Island in System Settings › Login Items.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez Caffe Island dans Réglages Système › Ouverture."
+          }
+        }
+      }
+    },
+    "App": {
+      "comment": "Spotlight/Shortcuts parameter: the app to wait for.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App"
+          }
+        }
+      }
+    },
+    "Automatic": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatique"
+          }
+        }
+      }
+    },
+    "Automatic uses the notch on displays that have one and a floating pill below the menu bar elsewhere. When hidden, point at the top centre of the screen to open it.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatique utilise l’encoche sur les écrans qui en ont une, et une pastille flottante sous la barre des menus ailleurs. Une fois masquée, pointez en haut au centre de l’écran pour l’ouvrir."
+          }
+        }
+      }
+    },
+    "Battery": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batterie"
+          }
+        }
+      }
+    },
+    "Battery at %lld%%. Your Mac can sleep": {
+      "comment": "Toast when the battery guard stops a session; %lld is the battery percentage.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batterie à %lld %%. Votre Mac peut dormir"
+          }
+        }
+      }
+    },
     "Brewing… awake %@": {
       "comment": "Toast when a session starts. %@ = “for 30 min” / “until 19:45” / “until you stop it”.",
       "localizations": {
@@ -168,12 +272,62 @@
         }
       }
     },
+    "Caffe Island Settings": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages de Caffe Island"
+          }
+        }
+      }
+    },
+    "Caffeinated indefinitely": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éveillé sans limite"
+          }
+        }
+      }
+    },
+    "Caffeinated while %@ runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éveillé tant que %@ tourne"
+          }
+        }
+      }
+    },
+    "Caffeinated, %@ remaining": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éveillé, encore %@"
+          }
+        }
+      }
+    },
     "Cancel": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Annuler"
+          }
+        }
+      }
+    },
+    "Classic cup": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasse classique"
           }
         }
       }
@@ -198,6 +352,16 @@
         }
       }
     },
+    "Default duration": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durée par défaut"
+          }
+        }
+      }
+    },
     "Display sleeps in %@": {
       "comment": "%@ = countdown like 4:12.",
       "localizations": {
@@ -209,12 +373,82 @@
         }
       }
     },
+    "Display with the pointer": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran du pointeur"
+          }
+        }
+      }
+    },
     "Duration": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Durée"
+          }
+        }
+      }
+    },
+    "Floating pill": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pastille flottante"
+          }
+        }
+      }
+    },
+    "General": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Général"
+          }
+        }
+      }
+    },
+    "Has no effect on Macs without a battery.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sans effet sur les Mac sans batterie."
+          }
+        }
+      }
+    },
+    "Hide": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer"
+          }
+        }
+      }
+    },
+    "Hide when idle": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer au repos"
+          }
+        }
+      }
+    },
+    "Icon": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Icône"
           }
         }
       }
@@ -239,6 +473,17 @@
         }
       }
     },
+    "Island": {
+      "comment": "Settings tab for the notch/pill island.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Île"
+          }
+        }
+      }
+    },
     "Keep Awake": {
       "localizations": {
         "fr": {
@@ -259,6 +504,16 @@
         }
       }
     },
+    "Keep Awake While App Runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Éveillé tant qu’une app tourne"
+          }
+        }
+      }
+    },
     "Keep Mac Awake": {
       "localizations": {
         "fr": {
@@ -275,6 +530,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Garder le Mac éveillé jusqu’à"
+          }
+        }
+      }
+    },
+    "Keep Mac Awake While App Runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé tant qu’une app tourne"
           }
         }
       }
@@ -315,6 +580,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Garder le Mac éveillé jusqu’à ${time}"
+          }
+        }
+      }
+    },
+    "Keep Mac awake while ${app} runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder le Mac éveillé tant que ${app} tourne"
+          }
+        }
+      }
+    },
+    "Keep a fixed width": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder une largeur fixe"
           }
         }
       }
@@ -429,6 +714,16 @@
         }
       }
     },
+    "Keeps the Mac awake until an app quits.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garde le Mac éveillé jusqu’à ce qu’une app soit quittée."
+          }
+        }
+      }
+    },
     "Let Mac Sleep": {
       "localizations": {
         "fr": {
@@ -446,6 +741,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Veille du Mac dans %@"
+          }
+        }
+      }
+    },
+    "Main display": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écran principal"
+          }
+        }
+      }
+    },
+    "Menu Bar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre des menus"
           }
         }
       }
@@ -470,6 +785,107 @@
         }
       }
     },
+    "Mug": {
+      "comment": "Menu bar icon style: the app’s googly-eyed mug.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mug"
+          }
+        }
+      }
+    },
+    "Never": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jamais"
+          }
+        }
+      }
+    },
+    "Notch": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encoche"
+          }
+        }
+      }
+    },
+    "On battery. Your Mac can sleep": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur batterie. Votre Mac peut dormir"
+          }
+        }
+      }
+    },
+    "Only keep awake on power adapter": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garder éveillé uniquement sur secteur"
+          }
+        }
+      }
+    },
+    "Open Login Items…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Ouverture…"
+          }
+        }
+      }
+    },
+    "Open at Login": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir à la connexion"
+          }
+        }
+      }
+    },
+    "Open at login": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir à la connexion"
+          }
+        }
+      }
+    },
+    "Opening at login never keeps the Mac awake by itself.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’ouverture à la connexion ne garde jamais le Mac éveillé à elle seule."
+          }
+        }
+      }
+    },
+    "Over full-screen apps": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur les apps en plein écran"
+          }
+        }
+      }
+    },
     "Pick a duration to stay awake": {
       "localizations": {
         "fr": {
@@ -490,13 +906,22 @@
         }
       }
     },
-    "Quit Dynamic Caffe Island": {
-      "comment": "Contains the app name — keep it untranslated.",
+    "Quit Caffe Island": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quitter Dynamic Caffe Island"
+            "value": "Quitter Caffe Island"
+          }
+        }
+      }
+    },
+    "Reserves room for the timer so icons next to it never move.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réserve la place du minuteur pour que les icônes voisines ne bougent jamais."
           }
         }
       }
@@ -508,6 +933,56 @@
           "stringUnit": {
             "state": "translated",
             "value": "Économiseur d’écran dans %@"
+          }
+        }
+      }
+    },
+    "Settings…": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages…"
+          }
+        }
+      }
+    },
+    "Show": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher"
+          }
+        }
+      }
+    },
+    "Show alerts only": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alertes uniquement"
+          }
+        }
+      }
+    },
+    "Show in menu bar": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher dans la barre des menus"
+          }
+        }
+      }
+    },
+    "Show on": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher sur"
           }
         }
       }
@@ -574,12 +1049,52 @@
         }
       }
     },
+    "Stop when battery is below": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter sous un niveau de batterie de"
+          }
+        }
+      }
+    },
     "Stops the caffeine timer.": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Arrête le minuteur caféine."
+          }
+        }
+      }
+    },
+    "Style": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Style"
+          }
+        }
+      }
+    },
+    "That process has already finished": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce processus est déjà terminé"
+          }
+        }
+      }
+    },
+    "The menu bar item and the idle island are both hidden. To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’icône de la barre des menus et l’île au repos sont toutes deux masquées. Pour revenir ici, rouvrez Caffe Island depuis Spotlight ou le Finder, ou lancez `caffe settings`."
           }
         }
       }
@@ -594,12 +1109,42 @@
         }
       }
     },
+    "Timer only": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minuteur seul"
+          }
+        }
+      }
+    },
+    "To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour revenir ici, rouvrez Caffe Island depuis Spotlight ou le Finder, ou lancez `caffe settings`."
+          }
+        }
+      }
+    },
     "Today": {
       "localizations": {
         "fr": {
           "stringUnit": {
             "state": "translated",
             "value": "Aujourd’hui"
+          }
+        }
+      }
+    },
+    "Toggle with ⌃⌥C": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basculer avec ⌃⌥C"
           }
         }
       }
@@ -631,6 +1176,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jusqu’à…"
+          }
+        }
+      }
+    },
+    "Used by the keyboard shortcut and `caffe toggle`.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisée par le raccourci clavier et `caffe toggle`."
+          }
+        }
+      }
+    },
+    "Which app?": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle app ?"
+          }
+        }
+      }
+    },
+    "While an App Runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tant qu’une app tourne"
           }
         }
       }
@@ -698,6 +1273,16 @@
         }
       }
     },
+    "while %@ runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tant que %@ tourne"
+          }
+        }
+      }
+    },
     "∞": {
       "shouldTranslate": false
     },
@@ -707,6 +1292,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "☕ Éveillé jusqu’à %@"
+          }
+        }
+      }
+    },
+    "☕ Awake while %@ runs": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "☕ Éveillé tant que %@ tourne"
           }
         }
       }
