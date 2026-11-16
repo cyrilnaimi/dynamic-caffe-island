@@ -63,41 +63,112 @@ public actor ProfileRegistry {
         logger.info("registered \(bundle.id.raw, privacy: .public) (\(String(describing: bundle.origin)))")
     }
 
-    /// V1: walks `directory` for `*.bundle` subdirectories, loads their
-    /// `NSPrincipalClass`, and registers. V1 callsites are opt-in (none in
-    /// the default boot); T045a exercises this path end-to-end.
+    /// Conventional location for third-party profile bundles:
+    /// `~/Library/Application Support/Caffe Island/Profiles`.
+    public static var defaultBundleDirectory: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Library/Application Support", isDirectory: true)
+        return base
+            .appendingPathComponent("Caffe Island", isDirectory: true)
+            .appendingPathComponent("Profiles", isDirectory: true)
+    }
+
+    /// Walks `directory` for `*.bundle` entries, verifies each one per the
+    /// plugin trust model (see `BundleVerifier.swift`), asks `approve`, then
+    /// loads its `NSPrincipalClass` and registers it. V1 callsites are
+    /// opt-in (none in the default boot); T045a exercises this path.
     ///
-    /// SECURITY: this executes code from disk. Before wiring it into the
-    /// default boot, verify each bundle's code signature
-    /// (`SecStaticCodeCheckValidity` against a team requirement) and only
-    /// scan a directory the user owns. Hardened runtime library validation
-    /// already blocks unsigned bundles in Release builds.
-    public func loadBundles(from directory: URL) throws {
-        let fm = FileManager.default
-        guard let contents = try? fm.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
-            return
+    /// Never throws: a refused or broken bundle is skipped, logged, and
+    /// reported in `BundleLoadResult.rejections` without affecting the
+    /// others. A missing directory yields an empty result; an untrusted
+    /// directory yields a single rejection for the directory itself.
+    ///
+    /// - Parameters:
+    ///   - policy: signature policy; defaults to Developer ID from the app's
+    ///     own team. `.anyValidSignature` is for tests/development only.
+    ///   - approve: called with the verified signer before the bundle's code
+    ///     is loaded; return true to load it. Defaults to deny. The caller
+    ///     owns remembering approvals (e.g. keyed on `cdHash`).
+    @discardableResult
+    public func loadBundles(
+        from directory: URL,
+        policy: BundleTrustPolicy = .default,
+        approve: @Sendable (BundleSignerInfo) async -> Bool = { _ in false }
+    ) async -> BundleLoadResult {
+        var result = BundleLoadResult()
+        let verifier = BundleVerifier(policy: policy)
+
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: directory.path, isDirectory: &isDir) else {
+            logger.debug("profile bundle directory \(directory.path, privacy: .public) does not exist")
+            return result
         }
-        for url in contents where url.pathExtension == "bundle" {
-            guard let bundle = Bundle(url: url) else {
-                throw RegistrationError.bundleInvalid(url, reason: "not a loadable bundle")
-            }
-            try bundle.loadAndCheck()
-            guard let cls = bundle.principalClass as? any Profile.Type else {
-                throw RegistrationError.bundleInvalid(url, reason: "principalClass is not a Profile")
-            }
-            let contractVersionString = bundle.infoDictionary?["ProfileKitContractVersion"] as? String ?? "1.0.0"
-            let contractVersion = SemanticVersion.parse(contractVersionString) ?? SemanticVersion(1, 0, 0)
-            let versionString = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-            let version = SemanticVersion.parse(versionString) ?? SemanticVersion(1, 0, 0)
-            let profileBundle = ProfileBundle(
-                id: cls.id,
-                version: version,
-                contractVersion: contractVersion,
-                origin: .userBundle(url),
-                principalType: cls
+
+        let root: URL
+        do {
+            root = try verifier.checkDirectory(directory)
+        } catch {
+            reject(directory, error, into: &result)
+            return result
+        }
+
+        let contents: [URL]
+        do {
+            contents = try FileManager.default.contentsOfDirectory(
+                at: root, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]
             )
-            try register(bundle: profileBundle)
+        } catch {
+            reject(directory, BundleRejectionReason.loadFailed(error.localizedDescription), into: &result)
+            return result
         }
+
+        for url in contents.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+        where url.pathExtension == "bundle" {
+            do {
+                let signer = try verifier.verify(bundleAt: url, in: root)
+                guard await approve(signer) else {
+                    throw BundleRejectionReason.notApprovedByUser(signer)
+                }
+                let id = try loadVerifiedBundle(at: signer.bundleURL)
+                result.loaded.append(id)
+                logger.info("loaded profile bundle \(url.path, privacy: .public) team=\(signer.teamIdentifier ?? "ad-hoc", privacy: .public)")
+            } catch {
+                reject(url, error, into: &result)
+            }
+        }
+        return result
+    }
+
+    private func reject(_ url: URL, _ error: Error, into result: inout BundleLoadResult) {
+        let reason = (error as? BundleRejectionReason) ?? .loadFailed(String(describing: error))
+        logger.error("refused profile bundle \(url.path, privacy: .public): \(reason.description, privacy: .public)")
+        result.rejections.append(BundleRejection(url: url, reason: reason))
+    }
+
+    /// Loads and registers a bundle that already passed verification and
+    /// approval. Executes the bundle's code.
+    private func loadVerifiedBundle(at url: URL) throws -> ProfileID {
+        guard let bundle = Bundle(url: url) else {
+            throw RegistrationError.bundleInvalid(url, reason: "not a loadable bundle")
+        }
+        try bundle.loadAndCheck()
+        guard let cls = bundle.principalClass as? any Profile.Type else {
+            throw RegistrationError.bundleInvalid(url, reason: "principalClass is not a Profile")
+        }
+        let contractVersionString = bundle.infoDictionary?["ProfileKitContractVersion"] as? String ?? "1.0.0"
+        let contractVersion = SemanticVersion.parse(contractVersionString) ?? SemanticVersion(1, 0, 0)
+        let versionString = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+        let version = SemanticVersion.parse(versionString) ?? SemanticVersion(1, 0, 0)
+        let profileBundle = ProfileBundle(
+            id: cls.id,
+            version: version,
+            contractVersion: contractVersion,
+            origin: .userBundle(url),
+            principalType: cls
+        )
+        try register(bundle: profileBundle)
+        return cls.id
     }
 
     // MARK: - Enable/disable (FR-026)
