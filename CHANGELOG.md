@@ -28,6 +28,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   action. Ends within moments of the exit with a message.
 - Battery guard: stop below 10/20/30 % or when unplugged.
 - Open at login (`SMAppService`), never starting a session by itself.
+- ⏻ Quit button in the expanded island; it ends a running session first,
+  so it works even with the menu bar item hidden.
+- Show the app in the menu bar, the Dock, both, or the island only (no
+  relaunch). Dock mode adds ⌘⇥, an App menu (Settings… ⌘,, Quit ⌘Q), a
+  Dock menu with the menu bar's commands, and an optional remaining-time
+  badge updated once a minute.
 - Option to hide the menu bar item.
 - Plugin bundles are verified before loading: valid code signature against
   a Developer ID team requirement, user-owned non-writable directory, no

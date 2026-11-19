@@ -279,6 +279,7 @@ private struct ExpandedPanel: View {
                         .foregroundStyle(Palette.crema)
                         .accessibilityHidden(true)
                 }
+                QuitButton()
             }
         }
     }
@@ -352,6 +353,31 @@ private struct ExpandedPanel: View {
     private func ringFraction(_ now: Date) -> CGFloat {
         guard let session = state.caffeineState.session else { return 0 }
         return Format.fraction(session, now: now)
+    }
+}
+
+/// ⏻ at the trailing end of the header: dim until hovered so it never
+/// competes with the countdown or Stop. The way out when the menu bar item
+/// is hidden.
+private struct QuitButton: View {
+    @State private var hover = false
+    @Environment(\.colorSchemeContrast) private var contrast
+
+    var body: some View {
+        Button {
+            AppRuntime.shared.quit()
+        } label: {
+            Image(systemName: "power")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(hover ? Color.white : Palette.dim(contrast))
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(hover ? Palette.chipHover : Color.clear))
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .help("Quit Caffe Island")
+        .accessibilityLabel(Text("Quit Caffe Island"))
     }
 }
 

@@ -383,6 +383,17 @@
         }
       }
     },
+    "Dock": {
+      "comment": "“Show Caffe Island in” choice: Dock icon only.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock"
+          }
+        }
+      }
+    },
     "Duration": {
       "localizations": {
         "fr": {
@@ -453,6 +464,16 @@
         }
       }
     },
+    "In the Dock, click the icon to open Settings, or right-click it to keep your Mac awake.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans le Dock, cliquez sur l’icône pour ouvrir les réglages, ou faites un clic droit pour garder votre Mac éveillé."
+          }
+        }
+      }
+    },
     "Indefinite": {
       "localizations": {
         "fr": {
@@ -480,6 +501,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Île"
+          }
+        }
+      }
+    },
+    "Island only": {
+      "comment": "“Show Caffe Island in” choice: neither menu bar item nor Dock icon.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Île seulement"
           }
         }
       }
@@ -765,6 +797,28 @@
         }
       }
     },
+    "Menu bar": {
+      "comment": "“Show Caffe Island in” choice: menu bar item only.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre des menus"
+          }
+        }
+      }
+    },
+    "Menu bar and Dock": {
+      "comment": "“Show Caffe Island in” choice: both.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barre des menus et Dock"
+          }
+        }
+      }
+    },
     "Midnight": {
       "localizations": {
         "fr": {
@@ -957,6 +1011,17 @@
         }
       }
     },
+    "Show Caffe Island in": {
+      "comment": "Settings › General picker: menu bar, Dock, both, or island only.",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher Caffe Island dans"
+          }
+        }
+      }
+    },
     "Show alerts only": {
       "localizations": {
         "fr": {
@@ -983,6 +1048,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Afficher sur"
+          }
+        }
+      }
+    },
+    "Show time remaining on the Dock icon": {
+      "comment": "Dock badge toggle (“25m”, “1h05”, “∞”).",
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher le temps restant sur l’icône du Dock"
           }
         }
       }

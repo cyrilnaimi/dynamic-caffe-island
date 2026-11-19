@@ -22,6 +22,7 @@ final class AppRuntime {
     private var started = false
     private var cancellables = Set<AnyCancellable>()
     private var keyMonitor: Any?
+    private var badgeTimer: Timer?
     private let logger = Logger(subsystem: "ch.dynamic-caffe-island.app", category: "runtime")
 
     private init() {}
@@ -61,6 +62,19 @@ final class AppRuntime {
             }
             .store(in: &cancellables)
 
+        // Dock icon on/off without a relaunch, and its remaining-time badge.
+        // `@Published` emits before the property changes, so the sinks use
+        // the emitted values rather than reading `settings`.
+        settings.$showInDock
+            .removeDuplicates()
+            .sink { [weak self] show in self?.applyDockPresence(show) }
+            .store(in: &cancellables)
+        Publishers.CombineLatest3(state.$caffeineState, settings.$showInDock, settings.$dockBadge)
+            .sink { [weak self] caffeine, show, badge in
+                self?.updateDockBadge(session: caffeine.session, show: show, badge: badge)
+            }
+            .store(in: &cancellables)
+
         // ⌘, opens Settings whenever one of our windows is in front
         // (an LSUIElement app has no app menu to carry the shortcut).
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
@@ -84,6 +98,13 @@ final class AppRuntime {
     }
 
     func stop() { state.cancelCaffeine() }
+
+    /// Ends a running session first so the Mac can sleep again right away,
+    /// then quits (the power assertion dies with the process anyway).
+    func quit() {
+        if state.caffeineState.session != nil { stop() }
+        NSApp.terminate(nil)
+    }
 
     /// ⌃⌥C and `caffe toggle`: stop, or start the default duration from Settings.
     func toggle() {
@@ -154,6 +175,46 @@ final class AppRuntime {
         perform(command)
     }
 
+    // MARK: - Dock
+
+    /// `.regular` shows the Dock icon, ⌘⇥ and the main menu; `.accessory`
+    /// is the menu-bar-only default (`LSUIElement`).
+    private func applyDockPresence(_ show: Bool) {
+        let policy: NSApplication.ActivationPolicy = show ? .regular : .accessory
+        guard NSApp.activationPolicy() != policy else { return }
+        NSApp.setActivationPolicy(policy)
+        logger.info("dock icon \(show ? "shown" : "hidden", privacy: .public)")
+        // Changing the policy deactivates the app; keep an open Settings
+        // window (where the switch was flipped) in front.
+        DispatchQueue.main.async { [weak self] in self?.settingsWindow.bringToFrontIfOpen() }
+    }
+
+    /// Remaining time on the Dock icon, refreshed only when the shown
+    /// minute changes (no per-second Dock redraws).
+    private func updateDockBadge(session: CaffeinationSession?, show: Bool, badge: Bool) {
+        badgeTimer?.invalidate()
+        badgeTimer = nil
+        guard show, badge, let session else {
+            if NSApp.dockTile.badgeLabel != nil { NSApp.dockTile.badgeLabel = nil }
+            return
+        }
+        let remaining = session.remaining()
+        let text = DockBadge.text(remaining: remaining)
+        if NSApp.dockTile.badgeLabel != text { NSApp.dockTile.badgeLabel = text }
+        guard let delay = DockBadge.secondsUntilChange(remaining: remaining) else { return }
+        let timer = Timer(timeInterval: delay, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.updateDockBadge(session: self.state.caffeineState.session,
+                                     show: self.settings.showInDock,
+                                     badge: self.settings.dockBadge)
+            }
+        }
+        timer.tolerance = 0.2
+        RunLoop.main.add(timer, forMode: .common)
+        badgeTimer = timer
+    }
+
     // MARK: - Battery guard
 
     private func applyBatteryGuard(_ power: PowerSourceSnapshot) {
@@ -176,6 +237,11 @@ final class AppRuntime {
 /// (reliable for menu-bar-only SwiftUI apps with no WindowGroup).
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
+        // Info.plist keeps LSUIElement, so a menu-bar-only launch never
+        // flashes a Dock icon; Dock mode switches the policy before any UI.
+        if AppSettings.launchShowsDock() {
+            NSApp.setActivationPolicy(.regular)
+        }
         NSAppleEventManager.shared().setEventHandler(
             self,
             andSelector: #selector(handleURLEvent(_:reply:)),
@@ -193,6 +259,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         Task { @MainActor in AppRuntime.shared.showSettings() }
         return false
+    }
+
+    /// Right-click on the Dock icon (Dock mode): same commands as the menu bar.
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        MainActor.assumeIsolated { DockMenu.make() }
     }
 
     @objc private func handleURLEvent(_ event: NSAppleEventDescriptor, reply: NSAppleEventDescriptor) {

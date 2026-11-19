@@ -35,6 +35,13 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         w.makeFirstResponder(nil)
     }
 
+    /// Re-fronts the window if it is open (after an activation policy change).
+    func bringToFrontIfOpen() {
+        guard let window, window.isVisible else { return }
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
+    }
+
     func windowWillClose(_ notification: Notification) { window = nil }
 }
 
@@ -118,6 +125,21 @@ private struct GeneralTab: View {
                 Footer("Opening at login never keeps the Mac awake by itself.")
             }
             Section {
+                Picker("Show Caffe Island in", selection: $settings.presence) {
+                    Text("Menu bar").tag(AppPresence.menuBar)
+                    Text("Dock").tag(AppPresence.dock)
+                    Text("Menu bar and Dock").tag(AppPresence.both)
+                    Text("Island only").tag(AppPresence.islandOnly)
+                }
+                Toggle("Show time remaining on the Dock icon", isOn: $settings.dockBadge)
+                    .disabled(!settings.showInDock)
+                if settings.presence == .islandOnly {
+                    ComeBackHint(settings: settings)
+                }
+            } footer: {
+                Footer("In the Dock, click the icon to open Settings, or right-click it to keep your Mac awake.")
+            }
+            Section {
                 Picker("Default duration", selection: $settings.defaultMinutes) {
                     ForEach(AppSettings.durationChoices, id: \.self) { minutes in
                         Text(verbatim: CaffeinationDurationLabel.text(minutes)).tag(minutes)
@@ -169,16 +191,8 @@ private struct MenuBarTab: View {
         SettingsForm {
             Section {
                 Toggle("Show in menu bar", isOn: $settings.showMenuBarItem)
-                if !settings.showMenuBarItem {
-                    Label {
-                        Text(settings.hideIslandWhenIdle
-                             ? "The menu bar item and the idle island are both hidden. To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`."
-                             : "To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`.")
-                    } icon: {
-                        Image(systemName: "info.circle")
-                    }
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                if !settings.showMenuBarItem && !settings.showInDock {
+                    ComeBackHint(settings: settings)
                 }
             }
             Section {
@@ -193,6 +207,24 @@ private struct MenuBarTab: View {
             }
             .disabled(!settings.showMenuBarItem)
         }
+    }
+}
+
+/// How to reach Settings again once neither the menu bar item nor the Dock
+/// icon is shown.
+private struct ComeBackHint: View {
+    @ObservedObject var settings: AppSettings
+
+    var body: some View {
+        Label {
+            Text(settings.hideIslandWhenIdle
+                 ? "The menu bar item and the idle island are both hidden. To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`."
+                 : "To come back here, open Caffe Island again from Spotlight or Finder, or run `caffe settings`.")
+        } icon: {
+            Image(systemName: "info.circle")
+        }
+        .font(.callout)
+        .foregroundStyle(.secondary)
     }
 }
 
