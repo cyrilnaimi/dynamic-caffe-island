@@ -10,7 +10,9 @@ struct KeepAwakeMenu: View {
 
     var body: some View {
         Group {
-            if state.caffeineState.isActive {
+            // `session != nil`, not `isActive`: a session in its last
+            // seconds (`.expiring`) still keeps the Mac awake.
+            if state.caffeineState.session != nil {
                 Button("Stop") {
                     state.cancelCaffeine()
                 }
@@ -18,18 +20,12 @@ struct KeepAwakeMenu: View {
                 Divider()
             }
 
-            Button("5 minutes")  { state.startCaffeine(duration: .preset(5 * 60)) }
-                .keyboardShortcut("1", modifiers: [.command])
-            Button("15 minutes") { state.startCaffeine(duration: .preset(15 * 60)) }
-                .keyboardShortcut("2", modifiers: [.command])
-            Button("30 minutes") { state.startCaffeine(duration: .preset(30 * 60)) }
-                .keyboardShortcut("3", modifiers: [.command])
-            Button("1 hour")     { state.startCaffeine(duration: .preset(60 * 60)) }
-                .keyboardShortcut("4", modifiers: [.command])
-            Button("2 hours")    { state.startCaffeine(duration: .preset(2 * 60 * 60)) }
-                .keyboardShortcut("5", modifiers: [.command])
-            Button("5 hours")    { state.startCaffeine(duration: .preset(5 * 60 * 60)) }
-                .keyboardShortcut("6", modifiers: [.command])
+            ForEach(KeepAwakeCommands.presets, id: \.minutes) { preset in
+                Button(String(localized: preset.title)) {
+                    state.startCaffeine(duration: .preset(TimeInterval(preset.minutes * 60)))
+                }
+                .keyboardShortcut(preset.key, modifiers: [.command])
+            }
 
             Divider()
 
@@ -65,11 +61,31 @@ struct KeepAwakeMenu: View {
             Divider()
 
             Button("Quit Caffe Island") {
-                NSApp.terminate(nil)
+                AppRuntime.shared.quit()
             }
             .keyboardShortcut("q")
         }
     }
+
+    static func runningApps() -> [NSRunningApplication] { KeepAwakeCommands.runningApps() }
+}
+
+/// What the menu bar menu and the Dock menu both offer, defined once.
+enum KeepAwakeCommands {
+    struct Preset {
+        let minutes: Int
+        let title: LocalizedStringResource
+        let key: KeyEquivalent
+    }
+
+    static let presets: [Preset] = [
+        Preset(minutes: 5, title: "5 minutes", key: "1"),
+        Preset(minutes: 15, title: "15 minutes", key: "2"),
+        Preset(minutes: 30, title: "30 minutes", key: "3"),
+        Preset(minutes: 60, title: "1 hour", key: "4"),
+        Preset(minutes: 120, title: "2 hours", key: "5"),
+        Preset(minutes: 300, title: "5 hours", key: "6"),
+    ]
 
     /// Regular (Dock) apps, alphabetically, excluding this one.
     static func runningApps() -> [NSRunningApplication] {

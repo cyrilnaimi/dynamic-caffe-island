@@ -46,6 +46,30 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// Where the app shows up besides the island. Two independent switches
+/// (`showMenuBarItem`, `showInDock`) presented as one choice.
+enum AppPresence: String, CaseIterable, Identifiable {
+    case menuBar
+    case dock
+    case both
+    /// Island, Spotlight, ⌃⌥C, `caffe://` and the CLI only.
+    case islandOnly
+
+    var id: String { rawValue }
+
+    init(menuBar: Bool, dock: Bool) {
+        switch (menuBar, dock) {
+        case (true, false): self = .menuBar
+        case (false, true): self = .dock
+        case (true, true): self = .both
+        case (false, false): self = .islandOnly
+        }
+    }
+
+    var showsMenuBar: Bool { self == .menuBar || self == .both }
+    var showsDock: Bool { self == .dock || self == .both }
+}
+
 /// User preferences, persisted in `UserDefaults`. Every change applies
 /// immediately: observers subscribe to the `@Published` properties.
 @MainActor
@@ -62,6 +86,10 @@ final class AppSettings: ObservableObject {
     @Published var islandScreen: IslandScreenChoice { didSet { save(islandScreen.rawValue, Key.islandScreen) } }
     @Published var fullScreenBehavior: FullScreenBehavior { didSet { save(fullScreenBehavior.rawValue, Key.fullScreenBehavior) } }
     @Published var showMenuBarItem: Bool { didSet { save(showMenuBarItem, Key.showMenuBarItem) } }
+    /// Dock icon, ⌘⇥ and a main menu (activation policy `.regular`).
+    @Published var showInDock: Bool { didSet { save(showInDock, Key.showInDock) } }
+    /// Remaining time on the Dock icon while a session runs.
+    @Published var dockBadge: Bool { didSet { save(dockBadge, Key.dockBadge) } }
     @Published var menuBarIcon: MenuBarIconStyle { didSet { save(menuBarIcon.rawValue, Key.menuBarIcon) } }
     /// Reserve the timer's width even when idle, so the item never resizes.
     @Published var menuBarFixedWidth: Bool { didSet { save(menuBarFixedWidth, Key.menuBarFixedWidth) } }
@@ -78,6 +106,8 @@ final class AppSettings: ObservableObject {
         static let islandScreen = "islandScreen"
         static let fullScreenBehavior = "fullScreenBehavior"
         static let showMenuBarItem = "showMenuBarItem"
+        static let showInDock = "showInDock"
+        static let dockBadge = "dockBadge"
         static let menuBarIcon = "menuBarIcon"
         static let menuBarFixedWidth = "menuBarFixedWidth"
         static let defaultMinutes = "defaultMinutes"
@@ -103,12 +133,28 @@ final class AppSettings: ObservableObject {
         islandScreen = string(Key.islandScreen, IslandScreenChoice.main)
         fullScreenBehavior = string(Key.fullScreenBehavior, FullScreenBehavior.hide)
         showMenuBarItem = bool(Key.showMenuBarItem, true)
+        showInDock = bool(Key.showInDock, false)
+        dockBadge = bool(Key.dockBadge, true)
         menuBarIcon = string(Key.menuBarIcon, MenuBarIconStyle.mug)
         menuBarFixedWidth = bool(Key.menuBarFixedWidth, false)
         defaultMinutes = int(Key.defaultMinutes, 30, in: Self.durationChoices)
         hotKeyEnabled = bool(Key.hotKeyEnabled, true)
         batteryThreshold = int(Key.batteryThreshold, 0, in: Self.batteryThresholdChoices)
         onlyOnPowerAdapter = bool(Key.onlyOnPowerAdapter, false)
+    }
+
+    /// Read before `AppSettings` exists, so a Dock-only launch never waits
+    /// for the main actor (and a menu-bar-only one never flashes a Dock icon).
+    nonisolated static func launchShowsDock(_ defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: Key.showInDock)
+    }
+
+    var presence: AppPresence {
+        get { AppPresence(menuBar: showMenuBarItem, dock: showInDock) }
+        set {
+            if showMenuBarItem != newValue.showsMenuBar { showMenuBarItem = newValue.showsMenuBar }
+            if showInDock != newValue.showsDock { showInDock = newValue.showsDock }
+        }
     }
 
     var batteryGuard: BatteryGuard {

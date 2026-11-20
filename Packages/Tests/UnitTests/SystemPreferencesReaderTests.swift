@@ -31,24 +31,45 @@ final class SystemPreferencesReaderTests: XCTestCase {
         XCTAssertFalse(inputs.caffeinationActive)
     }
 
-    func testParseLatestBlockExtractsCorrectly() {
-        let output = """
-        Battery Power:
-         displaysleep        2
-         sleep               5
-        AC Power:
-         displaysleep        10
-         sleep               20
-        """
-        let parsed = ProcessSource.parseLatestBlock(output)
-        // Last values win (the AC block here).
+    private let laptopOutput = """
+    Battery Power:
+     Sleep On Power Button 1
+     displaysleep         2
+     sleep                5
+     disksleep            10
+    AC Power:
+     Sleep On Power Button 1
+     displaysleep         10
+     sleep                20 (sleep prevented by caffeinate)
+     disksleep            10
+    """
+
+    func testParseUsesBatteryBlockOnBattery() {
+        let parsed = ProcessSource.parse(laptopOutput, powerSource: "Battery Power")
+        XCTAssertEqual(parsed.displayMinutes, 2)
+        XCTAssertEqual(parsed.sleepMinutes, 5)
+    }
+
+    func testParseUsesACBlockOnAC() {
+        let parsed = ProcessSource.parse(laptopOutput, powerSource: "AC Power")
         XCTAssertEqual(parsed.displayMinutes, 10)
         XCTAssertEqual(parsed.sleepMinutes, 20)
     }
 
+    func testParseDesktopWithOnlyACBlock() {
+        let output = """
+        AC Power:
+         displaysleep         15
+         sleep                0
+        """
+        let parsed = ProcessSource.parse(output, powerSource: nil)
+        XCTAssertEqual(parsed.displayMinutes, 15)
+        XCTAssertEqual(parsed.sleepMinutes, 0)
+    }
+
     func testParseHandlesMissingKeys() {
         let output = "Nothing useful here"
-        let parsed = ProcessSource.parseLatestBlock(output)
+        let parsed = ProcessSource.parse(output, powerSource: "AC Power")
         XCTAssertNil(parsed.displayMinutes)
         XCTAssertNil(parsed.sleepMinutes)
     }

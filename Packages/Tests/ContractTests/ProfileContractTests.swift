@@ -15,6 +15,19 @@ final class ProfileContractTests: XCTestCase {
         }
     }
 
+    func testRegisterInstanceKeepsThatInstance() async throws {
+        let registry = ProfileRegistry()
+        let mine = DummyProfile()
+        try await registry.register(instance: mine)
+        let registered = await registry.registeredProfiles
+        XCTAssertEqual(registered.count, 1)
+        XCTAssertTrue(registered.first === mine, "registry must own the caller's instance, not a copy")
+        do {
+            try await registry.register(DummyProfile.self)
+            XCTFail("expected RegistrationError.duplicate")
+        } catch is RegistrationError {}
+    }
+
     func testB1_DuplicateRegistrationThrows() async throws {
         // Use an isolated registry instance for this assertion.
         let registry = ProfileRegistry()

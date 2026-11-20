@@ -76,7 +76,8 @@ public final class LivePowerAssertionClient: PowerAssertionClient, @unchecked Se
     }
 }
 
-/// Owning-handle wrapper. `deinit` + atexit + SIGTERM/SIGINT release (FR-006).
+/// Owning-handle wrapper. Released on `deinit` and at exit (FR-006); on a
+/// signal or crash the kernel drops the assertion with the process.
 public final class AssertionHandle: @unchecked Sendable {
     public let token: UInt32
     public let name: String

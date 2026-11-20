@@ -75,6 +75,23 @@ public final class VisibilityObserver: NSObject {
             if asleep { self?.ticker.pause() } else { self?.ticker.resume() }
         })
 
+        // A display can wake without any screen-parameters change, so pause
+        // and resume on the display sleep/wake notifications themselves.
+        observers.append(NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.screensDidSleepNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.logger.info("screens asleep → pause ticker")
+            self?.ticker.pause()
+        })
+        observers.append(NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.screensDidWakeNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.logger.info("screens awake → resume ticker")
+            self?.ticker.resume()
+        })
+
         // Frontmost full-screen detection (coarse-grained).
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.activeSpaceDidChangeNotification,
