@@ -1,0 +1,6 @@
+# Shows the "Sponsor" button on the GitHub repo page.
+# GitHub Sponsors must be enabled for the account first: https://github.com/sponsors
+github: [cyrilnaimi]
+# A caffeine app deserves a coffee button — uncomment once the page exists:
+# buy_me_a_coffee: cyrilnaimi
+# ko_fi: cyrilnaimi

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Tiny CLI for Caffe Island.
+#   caffe                  # default duration (30 minutes)
+#   caffe 45               # 45 minutes
+#   caffe on|∞             # indefinitely
+#   caffe stop             # let the Mac sleep
+#   caffe toggle
+#   caffe until 19:45      # until a time of day
+#   caffe -w PID           # while process PID runs   (also --while)
+#   caffe --app Xcode      # while an app runs (name or bundle id)
+#   caffe -- make test     # run a command, keep awake until it exits
+#   caffe settings
+set -euo pipefail
+
+usage() {
+  echo "usage: caffe [minutes|on|stop|toggle|peek|settings]" >&2
+  echo "       caffe until HH:MM | -w|--while PID | --app NAME | -- COMMAND [ARGS…]" >&2
+  exit 2
+}
+
+urlencode() { python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$1"; }
+
+arg="${1:-30}"
+case "$arg" in
+  --)
+    shift
+    [ $# -gt 0 ] || usage
+    # Ask the app to watch *this* pid, then become the command: exec keeps
+    # the pid, so the Mac stays awake exactly as long as the command runs,
+    # stdin/stdout stay attached, and its exit status is ours.
+    open -g "caffe://while?pid=$$"
+    exec "$@"
+    ;;
+  -w|--while)
+    pid="${2:-}"
+    [[ "$pid" =~ ^[0-9]+$ ]] || usage
+    kill -0 "$pid" 2>/dev/null || { echo "caffe: no process $pid" >&2; exit 1; }
+    url="caffe://while?pid=$pid" ;;
+  --app)
+    [ -n "${2:-}" ] || usage
+    url="caffe://while?app=$(urlencode "$2")" ;;
+  until)
+    [ -n "${2:-}" ] || usage
+    url="caffe://until?time=$(urlencode "$2")" ;;
+  stop|off)        url="caffe://stop" ;;
+  toggle)          url="caffe://toggle" ;;
+  peek|open)       url="caffe://peek" ;;
+  settings|prefs)  url="caffe://settings" ;;
+  on|inf|forever|∞) url="caffe://indefinite" ;;
+  -h|--help)       usage ;;
+  *[!0-9]*)        usage ;;
+  *)               url="caffe://start?minutes=$arg" ;;
+esac
+open -g "$url"
