@@ -28,7 +28,7 @@ jobs:
           - os: macos-15         # arm64
             arch: apple-silicon
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Toolchain
         run: |
