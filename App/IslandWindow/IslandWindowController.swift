@@ -130,6 +130,10 @@ final class IslandWindowController {
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.caffeineChanged($0) }
             .store(in: &cancellables)
+        appState.startFailedWhileRunning
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in self?.flash($0) }
+            .store(in: &cancellables)
 
         // Any island setting: rebuild / restyle immediately, no relaunch.
         Publishers.MergeMany(

@@ -1,4 +1,5 @@
 import Foundation
+import IOKit.ps
 import OSLog
 import SleepClock
 
@@ -121,11 +122,10 @@ public final class SystemPreferencesReader: @unchecked Sendable {
 // MARK: - Default source (production)
 
 /// Live source — shells out to `pmset` and `defaults -currentHost`.
-/// Both are called only on launch + notification (FR-030). The shell-out is
-/// acceptable because the alternative (`IOPMCopyPMPreferences`) returns
-/// per-profile settings and requires matching against the active power-source
-/// name, which adds complexity; `pmset -g custom` produces the currently-in-
-/// effect values directly.
+/// Both are called only on launch, on preference-change notifications and
+/// when the power source changes (FR-030). `pmset -g custom` lists one block
+/// per power source ("Battery Power", "AC Power", "UPS Power"); we read the
+/// block for the source the Mac is drawing from right now.
 public struct ProcessSource: SystemPreferencesReader.Source {
     public init() {}
 
@@ -133,12 +133,14 @@ public struct ProcessSource: SystemPreferencesReader.Source {
         guard let output = Self.runProcess(path: "/usr/bin/pmset", args: ["-g", "custom"]) else {
             return (nil, nil)
         }
-        // Walk the active profile's block — on most systems pmset -g custom
-        // prints both "Battery Power" and "AC Power" blocks; the active one
-        // is preceded by `*` or ends with `(current)`. As a safe default we
-        // take the last block (typically the currently-active one on Macs
-        // that prefer the connected source when plugged in).
-        return Self.parseLatestBlock(output)
+        return Self.parse(output, powerSource: Self.providingPowerSource())
+    }
+
+    /// "AC Power", "Battery Power" or "UPS Power" — the same names `pmset`
+    /// uses for its block headers. `nil` if IOKit can't tell.
+    static func providingPowerSource() -> String? {
+        guard let info = IOPSCopyPowerSourcesInfo()?.takeRetainedValue() else { return nil }
+        return IOPSGetProvidingPowerSourceType(info)?.takeUnretainedValue() as String?
     }
 
     public func readScreensaverSeconds() -> Int? {
@@ -172,22 +174,26 @@ public struct ProcessSource: SystemPreferencesReader.Source {
         return String(data: data, encoding: .utf8)
     }
 
-    static func parseLatestBlock(_ output: String) -> (displayMinutes: Int?, sleepMinutes: Int?) {
-        var display: Int?
-        var sleep: Int?
+    /// Values from the block for `powerSource`. Falls back to the last block
+    /// (a desktop only has "AC Power") when there is no such block.
+    static func parse(_ output: String, powerSource: String?) -> (displayMinutes: Int?, sleepMinutes: Int?) {
+        var blocks: [(name: String, display: Int?, sleep: Int?)] = []
         for line in output.split(separator: "\n") {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            let parts = trimmed.split(separator: " ", omittingEmptySubsequences: true).map(String.init)
+            let raw = String(line)
+            if !raw.hasPrefix(" "), !raw.hasPrefix("\t"), raw.hasSuffix(":") {
+                blocks.append((String(raw.dropLast()).trimmingCharacters(in: .whitespaces), nil, nil))
+                continue
+            }
+            let parts = raw.split(separator: " ", omittingEmptySubsequences: true).map(String.init)
             guard parts.count >= 2 else { continue }
+            if blocks.isEmpty { blocks.append(("", nil, nil)) }
             switch parts[0] {
-            case "displaysleep":
-                display = Int(parts[1])
-            case "sleep":
-                sleep = Int(parts[1])
-            default:
-                break
+            case "displaysleep": blocks[blocks.count - 1].display = Int(parts[1])
+            case "sleep": blocks[blocks.count - 1].sleep = Int(parts[1])
+            default: break
             }
         }
-        return (display, sleep)
+        let block = blocks.last { $0.name == powerSource } ?? blocks.last
+        return (block?.display, block?.sleep)
     }
 }

@@ -48,7 +48,13 @@ final class AppRuntime {
 
         // Battery guard: re-check on every power-source change, when a
         // session starts, and when the setting changes.
-        PowerSourceMonitor.shared.start { [weak self] power in self?.applyBatteryGuard(power) }
+        PowerSourceMonitor.shared.start { [weak self] power in
+            self?.applyBatteryGuard(power)
+            self?.powerSourceChanged(power)
+        }
+        lastOnACPower = PowerSourceMonitor.snapshot().onACPower
+        // (`applyBatteryGuard` reads the manager's live state: inside this
+        // sink `state.caffeineState` still holds the previous value.)
         state.$caffeineState
             .filter(\.isActive)
             .map { $0.session?.id }
@@ -75,10 +81,22 @@ final class AppRuntime {
             }
             .store(in: &cancellables)
 
-        // ⌘, opens Settings whenever one of our windows is in front
-        // (an LSUIElement app has no app menu to carry the shortcut).
+        // After sleep: end a session whose time ran out while the lid was
+        // closed, and correct the Dock badge (run-loop timers don't count
+        // time asleep).
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didWakeNotification)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.systemDidWake() }
+            .store(in: &cancellables)
+
+        // ⌘, opens Settings whenever one of our windows is in front. In
+        // menu-bar-only and island-only modes (activation policy
+        // `.accessory`) there is no main menu to carry the shortcut, so this
+        // monitor handles it. In Dock mode the App menu's Settings… ⌘, does,
+        // and the monitor stays out of the way.
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+            if NSApp.activationPolicy() != .regular,
+               event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
                event.charactersIgnoringModifiers == "," {
                 self?.showSettings()
                 return nil
@@ -102,35 +120,38 @@ final class AppRuntime {
     /// Ends a running session first so the Mac can sleep again right away,
     /// then quits (the power assertion dies with the process anyway).
     func quit() {
-        if state.caffeineState.session != nil { stop() }
+        if state.liveCaffeineState.session != nil { stop() }
         NSApp.terminate(nil)
     }
 
     /// ⌃⌥C and `caffe toggle`: stop, or start the default duration from Settings.
     func toggle() {
-        if state.caffeineState.session != nil { stop() } else { start(minutes: settings.defaultMinutes) }
+        if state.liveCaffeineState.session != nil { stop() } else { start(minutes: settings.defaultMinutes) }
     }
 
-    /// Keep awake until process `pid` exits.
-    func keepAwake(whileProcess pid: Int32) {
+    /// Keep awake until process `pid` exits. Returns the started session.
+    @discardableResult
+    func keepAwake(whileProcess pid: Int32) -> CaffeinationSession? {
         guard CaffeineSessionManager.isProcessRunning(pid) else {
             island.flash(String(localized: "That process has already finished"))
-            return
+            return nil
         }
-        state.startCaffeine(duration: .whileProcess(pid: pid, name: Self.processName(pid)))
+        return state.startCaffeine(duration: .whileProcess(pid: pid, name: Self.processName(pid)))
     }
 
     /// Keep awake while an app runs. `app` is a display name or bundle id.
-    func keepAwake(whileApp app: String) {
+    /// Returns the started session, `nil` if the app isn't running.
+    @discardableResult
+    func keepAwake(whileApp app: String) -> CaffeinationSession? {
         let running = NSWorkspace.shared.runningApplications.filter { !$0.isTerminated }
         let match = running.first { $0.bundleIdentifier?.caseInsensitiveCompare(app) == .orderedSame }
             ?? running.first { $0.localizedName?.caseInsensitiveCompare(app) == .orderedSame }
             ?? running.first { $0.activationPolicy == .regular && ($0.localizedName?.localizedCaseInsensitiveContains(app) ?? false) }
         guard let match else {
             island.flash(String(localized: "\(app) isn’t running"))
-            return
+            return nil
         }
-        keepAwake(whileProcess: match.processIdentifier)
+        return keepAwake(whileProcess: match.processIdentifier)
     }
 
     /// App name for a pid, or the executable name for a CLI process.
@@ -175,6 +196,27 @@ final class AppRuntime {
         perform(command)
     }
 
+    // MARK: - Sleep, wake, power source
+
+    private var lastOnACPower: Bool?
+
+    private func systemDidWake() {
+        state.caffeine.sessionManager.systemDidWake()
+        updateDockBadge(session: state.liveCaffeineState.session,
+                        show: settings.showInDock,
+                        badge: settings.dockBadge)
+    }
+
+    /// Plugging in or unplugging switches macOS to the other set of sleep
+    /// settings; re-read them so the sleep countdown follows. Battery-level
+    /// changes alone don't re-run `pmset`.
+    private func powerSourceChanged(_ power: PowerSourceSnapshot) {
+        guard power.onACPower != lastOnACPower else { return }
+        lastOnACPower = power.onACPower
+        let reader = state.sleep.reader
+        DispatchQueue.global(qos: .utility).async { reader.refresh() }
+    }
+
     // MARK: - Dock
 
     /// `.regular` shows the Dock icon, ⌘⇥ and the main menu; `.accessory`
@@ -182,11 +224,24 @@ final class AppRuntime {
     private func applyDockPresence(_ show: Bool) {
         let policy: NSApplication.ActivationPolicy = show ? .regular : .accessory
         guard NSApp.activationPolicy() != policy else { return }
+        let wasActive = NSApp.isActive
         NSApp.setActivationPolicy(policy)
         logger.info("dock icon \(show ? "shown" : "hidden", privacy: .public)")
-        // Changing the policy deactivates the app; keep an open Settings
-        // window (where the switch was flipped) in front.
-        DispatchQueue.main.async { [weak self] in self?.settingsWindow.bringToFrontIfOpen() }
+        guard show, wasActive else {
+            // Changing the policy deactivates the app; keep an open Settings
+            // window (where the switch was flipped) in front.
+            DispatchQueue.main.async { [weak self] in self?.settingsWindow.bringToFrontIfOpen() }
+            return
+        }
+        // An app that is already active doesn't get its main menu installed
+        // when it becomes `.regular`: macOS only rebuilds the menu bar on
+        // activation. Hand activation to the Dock for a moment, then take
+        // it back, so App › Settings… ⌘, and Quit ⌘Q appear at once.
+        NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first?.activate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+            NSApp.activate(ignoringOtherApps: true)
+            self?.settingsWindow.bringToFrontIfOpen()
+        }
     }
 
     /// Remaining time on the Dock icon, refreshed only when the shown
@@ -218,7 +273,7 @@ final class AppRuntime {
     // MARK: - Battery guard
 
     private func applyBatteryGuard(_ power: PowerSourceSnapshot) {
-        guard state.caffeineState.session != nil else { return }
+        guard state.liveCaffeineState.session != nil else { return }
         switch settings.batteryGuard.verdict(for: power) {
         case .allow:
             return

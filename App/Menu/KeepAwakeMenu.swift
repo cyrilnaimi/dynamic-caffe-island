@@ -10,7 +10,9 @@ struct KeepAwakeMenu: View {
 
     var body: some View {
         Group {
-            if state.caffeineState.isActive {
+            // `session != nil`, not `isActive`: a session in its last
+            // seconds (`.expiring`) still keeps the Mac awake.
+            if state.caffeineState.session != nil {
                 Button("Stop") {
                     state.cancelCaffeine()
                 }

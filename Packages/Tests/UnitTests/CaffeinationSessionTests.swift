@@ -119,4 +119,107 @@ final class CaffeinationSessionTests: XCTestCase {
         mgr.cancelSession()
         XCTAssertEqual(mgr.lastEndReason, .cancelled)
     }
+
+    // MARK: - Ending only the session a timer or watch was set up for (#26)
+
+    func testStaleExpiryDoesNotEndNewSession() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let old = try mgr.startSession(duration: .preset(60))
+        let new = try mgr.startSession(duration: .indefinite)
+        mgr.expire(sessionID: old.id)                      // stale timer handler
+        XCTAssertEqual(mgr.currentState, .active(new))
+        XCTAssertEqual(fake.liveTokens.count, 1)
+    }
+
+    func testStaleDwellDoesNotEndNewSession() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let old = try mgr.startSession(duration: .preset(60))
+        mgr.expire(sessionID: old.id)
+        XCTAssertEqual(mgr.currentState, .expiring(old))
+        let new = try mgr.startSession(duration: .indefinite)
+        mgr.endSession(reason: .expired, onlyIf: old.id)   // dwell block fires late
+        XCTAssertEqual(mgr.currentState, .active(new))
+        XCTAssertEqual(fake.liveTokens.count, 1)
+
+        // And the real dwell block, once it runs, leaves it alone too.
+        let settled = expectation(description: "dwell passed")
+        DispatchQueue.global().asyncAfter(deadline: .now() + CaffeineSessionManager.expiryDwell + 0.3) { settled.fulfill() }
+        wait(for: [settled], timeout: 2)
+        XCTAssertEqual(mgr.currentState, .active(new))
+    }
+
+    func testStaleProcessExitDoesNotEndNewSession() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let child = try spawn("/bin/sleep", ["5"])
+        defer { child.terminate() }
+        let old = try mgr.startSession(duration: .whileProcess(pid: child.processIdentifier, name: "sleep"))
+        let new = try mgr.startSession(duration: .indefinite)
+        mgr.processExited(sessionID: old.id)
+        XCTAssertEqual(mgr.currentState, .active(new))
+        XCTAssertEqual(fake.liveTokens.count, 1)
+    }
+
+    func testExpiryEndsSessionAfterDwell() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        _ = try mgr.startSession(duration: .preset(0.05))
+        let ended = expectation(description: "expired")
+        let id = mgr.subscribe { if case .inactive = $0 { ended.fulfill() } }
+        wait(for: [ended], timeout: 2)
+        mgr.unsubscribe(id)
+        XCTAssertEqual(mgr.lastEndReason, .expired)
+        XCTAssertEqual(fake.liveTokens.count, 0)
+    }
+
+    // MARK: - Sleep and wake (#29)
+
+    func testWakePastEndExpiresAtOnce() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let session = try mgr.startSession(duration: .preset(3600))
+        mgr.systemDidWake(now: Date(timeIntervalSinceNow: 3700))
+        XCTAssertEqual(mgr.currentState, .expiring(session))
+    }
+
+    func testWakeBeforeEndKeepsSession() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let session = try mgr.startSession(duration: .preset(3600))
+        mgr.systemDidWake(now: Date(timeIntervalSinceNow: 1800))
+        XCTAssertEqual(mgr.currentState, .active(session))
+    }
+
+    // MARK: - Listener ordering (#27)
+
+    func testConcurrentChangesConvergeOnCurrentState() throws {
+        let fake = FakePowerAssertionClient()
+        let mgr = CaffeineSessionManager(client: fake)
+        let lastSeen = Locked<CaffeineState>(.inactive)
+        let id = mgr.subscribe { lastSeen.set($0) }
+        defer { mgr.unsubscribe(id) }
+
+        for round in 0 ..< 200 {
+            DispatchQueue.concurrentPerform(iterations: 8) { i in
+                if (i + round) % 3 == 0 {
+                    mgr.cancelSession()
+                } else {
+                    _ = try? mgr.startSession(duration: i % 2 == 0 ? .indefinite : .preset(60))
+                }
+            }
+            XCTAssertEqual(lastSeen.get(), mgr.currentState, "round \(round)")
+            XCTAssertEqual(fake.liveTokens.count, mgr.currentState.session == nil ? 0 : 1, "round \(round)")
+        }
+        mgr.cancelSession()
+    }
+}
+
+private final class Locked<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Value
+    init(_ value: Value) { self.value = value }
+    func get() -> Value { lock.lock(); defer { lock.unlock() }; return value }
+    func set(_ new: Value) { lock.lock(); value = new; lock.unlock() }
 }

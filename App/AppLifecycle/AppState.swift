@@ -21,6 +21,17 @@ public final class AppState: ObservableObject {
     @Published public private(set) var sleepState: SleepCountdownState = .idle(.none)
     @Published public private(set) var slotState: SlotState = .empty
 
+    /// A start failed while another session kept running. That session's
+    /// state (and its Stop) stays as it is; the UI explains the failure
+    /// with this message instead.
+    public let startFailedWhileRunning = PassthroughSubject<String, Never>()
+
+    /// The session manager's own state, current the moment a command
+    /// returns. `caffeineState` mirrors it for SwiftUI but arrives a little
+    /// later (through the event stream), so commands that must act on what
+    /// just happened read this instead.
+    public var liveCaffeineState: CaffeineState { caffeine.currentState }
+
     private let arbitrator = ArbitratorSession()
     private var arrivalCounter: UInt64 = 0
     private var caffeineTask: Task<Void, Never>?
@@ -42,8 +53,12 @@ public final class AppState: ObservableObject {
         guard !bootstrapped else { return }
         bootstrapped = true
         do {
-            try await ProfileRegistry.shared.register(CaffeineProfile.self)
-            try await ProfileRegistry.shared.register(SleepCountdownProfile.self)
+            // Register the instances this object drives, not fresh copies:
+            // a second SleepCountdownProfile would run pmset again and add
+            // duplicate observers, and registry calls (tearDown, enable)
+            // would act on profiles the UI never sees.
+            try await ProfileRegistry.shared.register(instance: caffeine)
+            try await ProfileRegistry.shared.register(instance: sleep)
             logger.info("registered two built-in profiles")
         } catch {
             logger.error("profile registration failed: \(error.localizedDescription, privacy: .public)")
@@ -108,13 +123,29 @@ public final class AppState: ObservableObject {
 
     // MARK: - Commands (menu → profile)
 
-    public func startCaffeine(duration: CaffeinationSession.Duration) {
+    /// Returns the started session, or `nil` if it couldn't start. A failed
+    /// start never hides a session that is still running.
+    @discardableResult
+    public func startCaffeine(duration: CaffeinationSession.Duration) -> CaffeinationSession? {
         do {
-            _ = try caffeine.startSession(duration: duration)
+            return try caffeine.startSession(duration: duration)
         } catch {
             logger.error("startCaffeine failed: \(error.localizedDescription, privacy: .public)")
-            caffeineState = .error(message: "Couldn't start caffeine")
+            let message: String
+            if case .processNotRunning = error as? CaffeineSessionError {
+                message = String(localized: "That process has already finished")
+            } else {
+                message = String(localized: "Couldn’t keep the Mac awake")
+            }
+            let live = caffeine.currentState
+            if live.session != nil {
+                caffeineState = live
+                startFailedWhileRunning.send(message)
+            } else {
+                caffeineState = .error(message: message)
+            }
             recomputeSlotState()
+            return nil
         }
     }
 

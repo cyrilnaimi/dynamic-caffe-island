@@ -10,7 +10,8 @@ enum DockMenu {
         let menu = NSMenu()
         menu.autoenablesItems = false
 
-        if runtime.state.caffeineState.isActive {
+        // Also while `.expiring`: the Mac is still being kept awake.
+        if runtime.state.liveCaffeineState.session != nil {
             menu.addItem(ActionItem(String(localized: "Stop")) { runtime.stop() })
             menu.addItem(.separator())
         }

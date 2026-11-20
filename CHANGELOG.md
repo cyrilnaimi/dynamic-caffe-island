@@ -58,6 +58,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `caffe://` URL scheme (`start?minutes=N`, `N`, `indefinite`, `stop`,
   `toggle`, `peek`) and `scripts/caffe` CLI wrapper.
 - ⌃⌥C global hotkey toggles a 30-minute session.
+
+### Fixed
+
+- A session ending on its own could end a session started at that moment;
+  expiry and process exit now only end the session they belong to.
+- The island and menus could show idle while the Mac was still being kept
+  awake (state changes from two threads arriving out of order).
+- Timed sessions now end at the time shown even if the Mac slept during
+  them, and the Dock badge is corrected right after wake.
+- A failed start (e.g. the watched process had just quit) no longer hides
+  Stop for the session that is still running; the failure shows as a
+  message instead.
+- The battery guard now applies as soon as a session starts, not only at
+  the next power-source change.
+- "Keep Mac Awake While App Runs" reports what really happened, and a quick
+  double ⌃⌥C starts then stops.
+- The sleep countdown uses the battery settings on battery and the adapter
+  settings on AC, and follows plugging in or unplugging.
+- The countdown no longer freezes after a display sleeps and wakes.
+- `kill` and Ctrl-C always end the app (the signal handler could hang it);
+  macOS releases the power assertion with the process.
+- The built-in profiles are created once at launch, not twice (`pmset` ran
+  twice and observers were duplicated).
+- Switching to Dock mode from Settings shows the App menu right away.
+- The Dock badge no longer shows one minute too many for a whole minute.
+- Stop stays in the menu bar and Dock menus during a session's last seconds.
+- ⌘, is handled by the App menu in Dock mode and by a key monitor otherwise,
+  not both.
 - `scripts/build-release.sh [--install]` — universal (arm64 + x86_64) Release
   build, ad-hoc signed, optionally installed to /Applications.
 - "Keep awake until" window redesigned (Today/Tomorrow, time remaining, quick

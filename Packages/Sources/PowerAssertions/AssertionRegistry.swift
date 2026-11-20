@@ -1,10 +1,13 @@
 import Foundation
 import OSLog
 
-/// Process-wide registry of live assertions. `atexit` and signal handlers
-/// walk this registry to release every outstanding assertion — that is how
-/// FR-006 / SC-009 are guaranteed even under graceful-quit, SIGTERM, SIGINT,
-/// uncaught-exception, and crash-without-deinit paths.
+/// Process-wide registry of live assertions. An `atexit` hook walks it to
+/// release every outstanding assertion on a normal exit.
+///
+/// There is deliberately no SIGTERM / SIGINT handler: the kernel drops a
+/// process's IOPM assertions when it dies, however it dies, so a signal
+/// needs no cleanup. A handler would have to take locks and allocate, which
+/// isn't async-signal-safe and could hang the app instead of ending it.
 public final class AssertionRegistry: @unchecked Sendable {
     public static let shared = AssertionRegistry()
 
@@ -27,8 +30,8 @@ public final class AssertionRegistry: @unchecked Sendable {
         live.remove(handle)
     }
 
-    /// Release every live assertion. Safe to call from atexit / signal
-    /// handler contexts (uses only lock + synchronous IOKit release).
+    /// Release every live assertion. Called from `atexit`; never from a
+    /// signal handler (it takes locks).
     public func releaseAll() {
         lock.lock()
         let snapshot = live.allObjects
@@ -58,24 +61,5 @@ public final class AssertionRegistry: @unchecked Sendable {
         atexit {
             AssertionRegistry.shared.releaseAll()
         }
-
-        // SIGTERM/SIGINT handlers — release all, then default action.
-        // We use sigaction with SA_RESETHAND so the default handler runs on
-        // the second signal.
-        Self.installSignalHandler(SIGTERM)
-        Self.installSignalHandler(SIGINT)
-    }
-
-    private static func installSignalHandler(_ sig: Int32) {
-        var action = sigaction()
-        action.__sigaction_u.__sa_handler = { _ in
-            AssertionRegistry.shared.releaseAll()
-            // Re-raise with default disposition for the second signal.
-            signal(SIGTERM, SIG_DFL)
-            signal(SIGINT, SIG_DFL)
-            _ = raise(SIGTERM)
-        }
-        action.sa_flags = Int32(SA_RESETHAND)
-        sigaction(sig, &action, nil)
     }
 }

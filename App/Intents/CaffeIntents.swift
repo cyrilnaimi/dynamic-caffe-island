@@ -107,8 +107,7 @@ struct StartCaffeWhileAppIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         await AppRuntime.shared.ensureStarted()
-        AppRuntime.shared.keepAwake(whileApp: app)
-        guard let process = AppRuntime.shared.state.caffeineState.session?.watchedProcess else {
+        guard let process = AppRuntime.shared.keepAwake(whileApp: app)?.watchedProcess else {
             return .result(dialog: "\(app) isn’t running")
         }
         return .result(dialog: "☕ Awake while \(process.name) runs")

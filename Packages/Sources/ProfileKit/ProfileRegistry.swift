@@ -30,7 +30,17 @@ public actor ProfileRegistry {
 
     // MARK: - Registration
 
+    /// Registers a built-in profile by type; the registry creates and owns
+    /// the instance.
     public func register(_ type: (some Profile).Type) throws {
+        try register(instance: type.init())
+    }
+
+    /// Registers a built-in profile the caller already created, so the
+    /// registry and the app share one instance (and one session manager,
+    /// one preferences reader) instead of each having their own.
+    public func register<P: Profile>(instance: P) throws {
+        let type = P.self
         let id = type.id
         if entries[id] != nil {
             logger.error("duplicate registration attempt for \(id.raw, privacy: .public)")
@@ -43,7 +53,6 @@ public actor ProfileRegistry {
             origin: .builtIn,
             principalType: type
         )
-        let instance = type.init()
         entries[id] = Entry(bundle: bundle, instance: instance, isEnabled: true)
         logger.info("registered \(id.raw, privacy: .public) (built-in)")
     }

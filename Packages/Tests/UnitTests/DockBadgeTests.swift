@@ -33,4 +33,17 @@ final class DockBadgeTests: XCTestCase {
         XCTAssertEqual(DockBadge.text(remaining: 150), "3m")
         XCTAssertEqual(DockBadge.text(remaining: 150 - delay), "2m")
     }
+
+    /// Just past a minute boundary the badge must change within a fraction
+    /// of a second, not a whole minute later (#22).
+    func testNearBoundaryChangesAlmostAtOnce() throws {
+        for remaining in [120.03, 60.03, 600.02] {
+            let delay = try XCTUnwrap(DockBadge.secondsUntilChange(remaining: remaining))
+            XCTAssertLessThan(delay, 0.1, "remaining \(remaining)")
+            let shownAfter = DockBadge.text(remaining: remaining - delay)
+            XCTAssertEqual(shownAfter, DockBadge.text(remaining: (remaining - delay).rounded(.down)), "remaining \(remaining)")
+            XCTAssertEqual(DockBadge.text(remaining: remaining - delay),
+                           "\(Int((remaining / 60).rounded(.down)))m", "remaining \(remaining)")
+        }
+    }
 }
