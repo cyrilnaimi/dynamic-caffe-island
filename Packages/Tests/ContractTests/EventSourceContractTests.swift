@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 import ProfileKit
 
@@ -33,12 +34,17 @@ final class EventSourceContractTests: XCTestCase {
     }
 }
 
-private final class ImmediateSource: EventSource {
+private final class ImmediateSource: EventSource, @unchecked Sendable {
     enum State: String, ProfileRuntimeState { case ready, active }
 
     typealias S = State
     private let initial: State
-    private var torn = false
+    private let lock = NSLock()
+    private var _torn = false  // guarded by `lock`
+    private var torn: Bool {
+        get { lock.lock(); defer { lock.unlock() }; return _torn }
+        set { lock.lock(); _torn = newValue; lock.unlock() }
+    }
 
     init(initial: State) {
         self.initial = initial
