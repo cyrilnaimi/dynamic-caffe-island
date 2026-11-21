@@ -6,6 +6,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.1.0-alpha.1] — 2026-11-21
+
+First public alpha. Builds are ad-hoc signed: the first time, right-click
+the app → Open (Developer ID signing is tracked in #10).
+
 ### Changed
 
 - Renamed to **Caffe Island** (app, menu, Spotlight, DMG volume, release
@@ -47,7 +52,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `PowerAssertions`, `SleepClock`, `BuiltInProfiles`), XcodeGen spec
   (`project.yml`), minimal `App/` target stub, `swift-format` config,
   `scripts/format.sh`, `scripts/measure-idle.sh` for SC-004 budgets, GitHub
-  Actions matrix CI across `macos-13` + `macos-14`.
+  Actions matrix CI on Intel (`macos-15-intel`) and Apple silicon
+  (`macos-15`).
 - Notch island: a black notch-shaped island hanging from the top edge of the
   primary display — wraps the hardware notch on notched MacBooks, simulates
   one everywhere else. Idle → live timer wings → toast on start/stop →
